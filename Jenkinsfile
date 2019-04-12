@@ -46,32 +46,38 @@ node {
         checkout scm
       }
 
-      stage('Maven/Tycho Build') {
-        withMavenJarsignerCredentials {
-          sh '''
-            export TEMP="${WORKSPACE}/tmp"
-            rm -rf "${TEMP}"
-            mkdir "${TEMP}"
-            mvn --settings /var/cache/m2/settings.xml clean install
-            rm -rf "${TEMP}"
-          '''
-	}
-      }
+    try{
+       stage('Maven/Tycho Build') {
+         withMavenJarsignerCredentials {
+           sh '''
+             export TEMP="${WORKSPACE}/tmp"
+             rm -rf "${TEMP}"
+             mkdir "${TEMP}"
+             mvn --settings /var/cache/m2/settings.xml clean install
+             rm -rf "${TEMP}"
+           '''
+         }
+       }
+       stage('Stage Build Artifacts') {
+         sh '''
+           #!/bin/bash -eux
 
-      stage('Stage Build Artifacts') {
-        sh '''
-          #!/bin/bash -eux
+           if [[ ! -d "/var/cache/build_artifacts/${JOB_NAME}/" ]]; then
+             mkdir -p "/var/cache/build_artifacts/${JOB_NAME}/"
+           else
+             rm -Rf "/var/cache/build_artifacts/${JOB_NAME}/*"
+           fi
 
-          if [[ ! -d "/var/cache/build_artifacts/${JOB_NAME}/" ]]; then
-            mkdir -p "/var/cache/build_artifacts/${JOB_NAME}/"
-          else
-            rm -Rf /var/cache/build_artifacts/${JOB_NAME}/*
-          fi
-
-          cp -a ${WORKSPACE}/org.knime.update.base/target/repository/ /var/cache/build_artifacts/${JOB_NAME}
-        '''
-      }
-    }
+           cp -a ${WORKSPACE}/org.knime.update.base/target/repository/ /var/cache/build_artifacts/${JOB_NAME}
+         '''
+       }
+       } catch (ex) {
+           currentBuild.result = 'FAILED'
+           throw ex
+       } finally {
+           notifications.notifyBuild(currentBuild.result);
+     }
+   }
   }
 }
 
