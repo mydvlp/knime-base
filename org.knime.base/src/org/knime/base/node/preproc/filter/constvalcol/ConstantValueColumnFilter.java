@@ -172,7 +172,7 @@ public class ConstantValueColumnFilter {
 
         final int[] indicesToKeep = columnCheckers.keySet().stream().mapToInt(i -> i).toArray();
         int index = 0;
-        for (final DataRow currentRow : inputTable.filter(TableFilter.materializeCols(spec, indicesToKeep), exec)) {
+        for (final DataRow currentRow : inputTable.filter(TableFilter.materializeCols(indicesToKeep), exec)) {
         	// the first row has already been read
             if (index++ == 0) {
                 continue;
