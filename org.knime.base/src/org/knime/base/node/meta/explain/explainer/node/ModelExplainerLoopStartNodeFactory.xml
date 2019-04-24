@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<knimeNode icon="explainer_icon.png" type="LoopStart"
+	xmlns="http://knime.org/node/v3.6"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://knime.org/node/v3.6 http://knime.org/node/v3.6.xsd">
+	<name>Model Explainer Loop Start</name>
+
+	<shortDescription>Start node for a Model Explainer loop
+	</shortDescription>
+
+	<fullDescription>
+		<intro>
+		<p>
+			TODO
+		</p>
+		
+			
+		</intro>
+		
+		<tab name="Options">
+			<option name="Treat all columns as single feature">
+				Check this box if all columns even collection and vector columns represent a single feature i.e. can only be changed as a whole.
+			</option>
+			<option name="Feature columns">
+				The columns that contain features your model requires.
+				Note that it is not allowed to have columns both as feature and prediction column.
+			</option>
+			
+			<option name="Explanation set size">
+				The number of rows to use for learning the local explanation model for a single incoming row.
+			</option>
+			<option name="Use seed">
+				Using a seed allows to reproduce the results of the loop. If this box is checked the seed displayed in the text box is used, otherwise a new seed is generated for each
+				execution. The new button allows to generate a new random seed.
+			</option>
+		</tab>
+	</fullDescription>
+	
+	<ports>
+		<inPort index="0" name="Table containing the rows to explain">
+			Table containing the rows to explain.
+		</inPort>
+		<inPort index="1" name="Sampling data">
+			Table containing rows used to perturb rows in the first table.
+		</inPort>
+		<outPort index="0" name="Explanation table">Explanation table.</outPort>
+	</ports>
+</knimeNode>
