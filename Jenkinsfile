@@ -29,6 +29,7 @@ properties([
 
 	pipelineTriggers([upstream('knime-expressions/' + env.BRANCH_NAME.replaceAll('/', '%2F'))]),
 	buildDiscarder(logRotator(numToKeepStr: '5')),
+	disableConcurrentBuilds()
 ])
 
 node('maven') {
