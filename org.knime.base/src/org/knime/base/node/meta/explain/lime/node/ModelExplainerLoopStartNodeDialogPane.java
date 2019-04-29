@@ -44,85 +44,52 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   01.04.2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   15.03.2016 (adrian): created
  */
-package org.knime.base.node.meta.explain.feature;
+package org.knime.base.node.meta.explain.lime.node;
 
-import org.knime.base.node.meta.explain.util.Caster;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataValue;
-import org.knime.core.data.MissingValueException;
+import org.knime.core.data.DataTableSpec;
+import org.knime.core.node.InvalidSettingsException;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NodeSettingsWO;
+import org.knime.core.node.NotConfigurableException;
 
-abstract class AbstractFeatureHandlerFactory<T extends DataValue> implements FeatureHandlerFactory {
+/**
+ *
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ */
+class ModelExplainerLoopStartNodeDialogPane extends NodeDialogPane {
 
-    private final Caster<T> m_caster;
-
-    abstract Class<T> getAcceptValueClass();
-
-    abstract int getNumFeatures(T value);
+    private final OptionsDialog m_options = new OptionsDialog();
 
     /**
      *
      */
-    public AbstractFeatureHandlerFactory() {
-        m_caster = new Caster<T>(getAcceptValueClass(), supportsMissingValues());
+    public ModelExplainerLoopStartNodeDialogPane() {
+        addTab("Options", m_options.getPanel());
     }
 
     /**
      * {@inheritDoc}
-     * @throws MissingValueException if a missing value is encountered and missing values are not supported
      */
     @Override
-    public final int numFeatures(final DataCell cell) {
-        final T value = m_caster.getAsT(cell);
-        return getNumFeatures(value);
+    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
+        final ModelExplainerSettings cfg = new ModelExplainerSettings();
+        m_options.saveSettingsTo(cfg);
+        cfg.saveSettings(settings);
     }
 
-    final Caster<T> getCaster() {
-        return m_caster;
-    }
-
-
-
-    abstract static class AbstractFeatureHandler <T extends DataValue> implements FeatureHandler {
-        T m_original;
-
-        T m_sampled;
-
-        private final Caster<T> m_caster;
-
-        AbstractFeatureHandler(final Caster<T> caster) {
-            m_caster = caster;
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setOriginal(final DataCell cell) {
-            m_original = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setSampled(final DataCell cell) {
-            m_sampled = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final void reset() {
-            m_original = null;
-            m_sampled = null;
-            resetReplaceState();
-        }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
+        throws NotConfigurableException {
+        final DataTableSpec inSpec = specs[0];
+        final ModelExplainerSettings cfg = new ModelExplainerSettings();
+        cfg.loadSettingsDialog(settings, inSpec);
+        m_options.loadSettingsFrom(cfg, inSpec);
     }
 
 }

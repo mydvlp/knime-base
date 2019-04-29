@@ -46,7 +46,7 @@
  * History
  *   Apr 15, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.explainer;
+package org.knime.base.node.meta.explain.lime;
 
 import java.util.NoSuchElementException;
 

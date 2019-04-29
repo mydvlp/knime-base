@@ -46,12 +46,12 @@
  * History
  *   14.03.2016 (adrian): created
  */
-package org.knime.base.node.meta.explain.explainer.node;
+package org.knime.base.node.meta.explain.lime.node;
 
 import java.io.File;
 import java.io.IOException;
 
-import org.knime.base.node.meta.explain.explainer.ModelExplainer;
+import org.knime.base.node.meta.explain.lime.ModelExplainer;
 import org.knime.core.data.DataTableSpec;
 import org.knime.core.node.BufferedDataTable;
 import org.knime.core.node.CanceledExecutionException;

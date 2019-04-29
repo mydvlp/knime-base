@@ -44,85 +44,23 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   01.04.2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.feature;
+package org.knime.base.node.meta.explain.lime.colstats;
 
-import org.knime.base.node.meta.explain.util.Caster;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataValue;
-import org.knime.core.data.MissingValueException;
+/**
+ *
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ */
+public final class BinaryFeatureStatistic implements FeatureStatistic {
 
-abstract class AbstractFeatureHandlerFactory<T extends DataValue> implements FeatureHandlerFactory {
-
-    private final Caster<T> m_caster;
-
-    abstract Class<T> getAcceptValueClass();
-
-    abstract int getNumFeatures(T value);
+    private final double m_prob;
 
     /**
      *
+     * @param probability of the output being 1
      */
-    public AbstractFeatureHandlerFactory() {
-        m_caster = new Caster<T>(getAcceptValueClass(), supportsMissingValues());
+    BinaryFeatureStatistic(final double probability) {
+        m_prob = probability;
     }
-
-    /**
-     * {@inheritDoc}
-     * @throws MissingValueException if a missing value is encountered and missing values are not supported
-     */
-    @Override
-    public final int numFeatures(final DataCell cell) {
-        final T value = m_caster.getAsT(cell);
-        return getNumFeatures(value);
-    }
-
-    final Caster<T> getCaster() {
-        return m_caster;
-    }
-
-
-
-    abstract static class AbstractFeatureHandler <T extends DataValue> implements FeatureHandler {
-        T m_original;
-
-        T m_sampled;
-
-        private final Caster<T> m_caster;
-
-        AbstractFeatureHandler(final Caster<T> caster) {
-            m_caster = caster;
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setOriginal(final DataCell cell) {
-            m_original = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setSampled(final DataCell cell) {
-            m_sampled = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final void reset() {
-            m_original = null;
-            m_sampled = null;
-            resetReplaceState();
-        }
-
-    }
-
 }

@@ -44,85 +44,59 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   01.04.2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   07.03.2019 (adrian): created
  */
-package org.knime.base.node.meta.explain.feature;
+package org.knime.base.node.meta.explain.lime.node;
 
-import org.knime.base.node.meta.explain.util.Caster;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DataValue;
-import org.knime.core.data.MissingValueException;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
-abstract class AbstractFeatureHandlerFactory<T extends DataValue> implements FeatureHandlerFactory {
-
-    private final Caster<T> m_caster;
-
-    abstract Class<T> getAcceptValueClass();
-
-    abstract int getNumFeatures(T value);
+/**
+ *
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ */
+public class ModelExplainerLoopStartNodeFactory extends NodeFactory<ModelExplainerLoopStartNodeModel> {
 
     /**
-     *
+     * {@inheritDoc}
      */
-    public AbstractFeatureHandlerFactory() {
-        m_caster = new Caster<T>(getAcceptValueClass(), supportsMissingValues());
+    @Override
+    public ModelExplainerLoopStartNodeModel createNodeModel() {
+        return new ModelExplainerLoopStartNodeModel();
     }
 
     /**
      * {@inheritDoc}
-     * @throws MissingValueException if a missing value is encountered and missing values are not supported
      */
     @Override
-    public final int numFeatures(final DataCell cell) {
-        final T value = m_caster.getAsT(cell);
-        return getNumFeatures(value);
+    protected int getNrNodeViews() {
+        return 0;
     }
 
-    final Caster<T> getCaster() {
-        return m_caster;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<ModelExplainerLoopStartNodeModel> createNodeView(final int viewIndex,
+        final ModelExplainerLoopStartNodeModel nodeModel) {
+        return null;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
 
-
-    abstract static class AbstractFeatureHandler <T extends DataValue> implements FeatureHandler {
-        T m_original;
-
-        T m_sampled;
-
-        private final Caster<T> m_caster;
-
-        AbstractFeatureHandler(final Caster<T> caster) {
-            m_caster = caster;
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setOriginal(final DataCell cell) {
-            m_original = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setSampled(final DataCell cell) {
-            m_sampled = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final void reset() {
-            m_original = null;
-            m_sampled = null;
-            resetReplaceState();
-        }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
+        return new ModelExplainerLoopStartNodeDialogPane();
     }
 
 }

@@ -44,85 +44,54 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   01.04.2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.feature;
+package org.knime.base.node.meta.explain.lime.colstats;
 
+import org.knime.base.node.meta.explain.lime.colstats.valueaccess.NominalValueAccessor;
 import org.knime.base.node.meta.explain.util.Caster;
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataValue;
-import org.knime.core.data.MissingValueException;
+import org.knime.core.data.NominalValue;
+import org.knime.core.data.collection.ListDataValue;
+import org.knime.core.node.util.CheckUtils;
 
-abstract class AbstractFeatureHandlerFactory<T extends DataValue> implements FeatureHandlerFactory {
+/**
+ *
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ */
+final class ListNominalValueAccessor implements NominalValueAccessor {
 
-    private final Caster<T> m_caster;
+    private final int m_idx;
 
-    abstract Class<T> getAcceptValueClass();
+    private final Caster<ListDataValue> m_caster = new Caster<>(ListDataValue.class, false);
 
-    abstract int getNumFeatures(T value);
+    private NominalValue m_value = null;
 
-    /**
-     *
-     */
-    public AbstractFeatureHandlerFactory() {
-        m_caster = new Caster<T>(getAcceptValueClass(), supportsMissingValues());
+    ListNominalValueAccessor(final int idx) {
+        m_idx = idx;
     }
 
     /**
      * {@inheritDoc}
-     * @throws MissingValueException if a missing value is encountered and missing values are not supported
      */
     @Override
-    public final int numFeatures(final DataCell cell) {
-        final T value = m_caster.getAsT(cell);
-        return getNumFeatures(value);
+    public void accept(final DataCell cell) {
+        final ListDataValue list = m_caster.getAsT(cell);
+        final DataCell element = list.get(m_idx);
+        CheckUtils.checkArgument(element instanceof NominalValue,
+            "Expected nominal value at list index %s but received object of type %s instead.", m_idx,
+            element.getType().getName());
+        m_value = (NominalValue)element;
     }
 
-    final Caster<T> getCaster() {
-        return m_caster;
-    }
-
-
-
-    abstract static class AbstractFeatureHandler <T extends DataValue> implements FeatureHandler {
-        T m_original;
-
-        T m_sampled;
-
-        private final Caster<T> m_caster;
-
-        AbstractFeatureHandler(final Caster<T> caster) {
-            m_caster = caster;
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setOriginal(final DataCell cell) {
-            m_original = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setSampled(final DataCell cell) {
-            m_sampled = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final void reset() {
-            m_original = null;
-            m_sampled = null;
-            resetReplaceState();
-        }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NominalValue getValue() {
+        CheckUtils.checkState(m_value != null,
+            "ListNominalValueAccessor#accept has to be called at least once before calling ListNominalValueAccessor#getValue.");
+        return m_value;
     }
 
 }

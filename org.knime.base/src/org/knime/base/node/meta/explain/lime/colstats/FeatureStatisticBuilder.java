@@ -44,52 +44,19 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   15.03.2016 (adrian): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.explainer.node;
+package org.knime.base.node.meta.explain.lime.colstats;
 
-import org.knime.core.data.DataTableSpec;
-import org.knime.core.node.InvalidSettingsException;
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NodeSettingsWO;
-import org.knime.core.node.NotConfigurableException;
+import org.knime.core.data.DataCell;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-class ModelExplainerLoopStartNodeDialogPane extends NodeDialogPane {
+interface FeatureStatisticBuilder<T extends FeatureStatistic> {
 
-    private final OptionsDialog m_options = new OptionsDialog();
+    void consume(final DataCell cell);
 
-    /**
-     *
-     */
-    public ModelExplainerLoopStartNodeDialogPane() {
-        addTab("Options", m_options.getPanel());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void saveSettingsTo(final NodeSettingsWO settings) throws InvalidSettingsException {
-        final ModelExplainerSettings cfg = new ModelExplainerSettings();
-        m_options.saveSettingsTo(cfg);
-        cfg.saveSettings(settings);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected void loadSettingsFrom(final NodeSettingsRO settings, final DataTableSpec[] specs)
-        throws NotConfigurableException {
-        final DataTableSpec inSpec = specs[0];
-        final ModelExplainerSettings cfg = new ModelExplainerSettings();
-        cfg.loadSettingsDialog(settings, inSpec);
-        m_options.loadSettingsFrom(cfg, inSpec);
-    }
-
+    T build();
 }

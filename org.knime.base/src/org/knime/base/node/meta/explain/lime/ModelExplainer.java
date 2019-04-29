@@ -46,18 +46,18 @@
  * History
  *   Apr 15, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.explainer;
+package org.knime.base.node.meta.explain.lime;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.knime.base.node.meta.explain.explainer.node.ModelExplainerSettings;
 import org.knime.base.node.meta.explain.feature.FeatureManager;
 import org.knime.base.node.meta.explain.feature.KnimeFeatureVectorIterator;
 import org.knime.base.node.meta.explain.feature.PerturberFactory;
 import org.knime.base.node.meta.explain.feature.SimpleReplacingPerturberFactory;
 import org.knime.base.node.meta.explain.feature.VectorEnabledPerturberFactory;
+import org.knime.base.node.meta.explain.lime.node.ModelExplainerSettings;
 import org.knime.base.node.meta.explain.util.DefaultRowSampler;
 import org.knime.base.node.meta.explain.util.RowSampler;
 import org.knime.base.node.meta.explain.util.TablePreparer;

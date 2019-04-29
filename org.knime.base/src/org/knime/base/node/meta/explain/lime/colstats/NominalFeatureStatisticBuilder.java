@@ -44,85 +44,61 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   01.04.2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.feature;
+package org.knime.base.node.meta.explain.lime.colstats;
 
-import org.knime.base.node.meta.explain.util.Caster;
+import java.util.HashMap;
+import java.util.Map.Entry;
+
+import org.knime.base.node.meta.explain.lime.colstats.valueaccess.NominalValueAccessor;
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataValue;
-import org.knime.core.data.MissingValueException;
+import org.knime.core.data.NominalValue;
+import org.knime.core.node.util.CheckUtils;
 
-abstract class AbstractFeatureHandlerFactory<T extends DataValue> implements FeatureHandlerFactory {
+/**
+ *
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ */
+final class NominalFeatureStatisticBuilder implements FeatureStatisticBuilder<NominalFeatureStatistic> {
 
-    private final Caster<T> m_caster;
+    private final NominalValueAccessor m_accessor;
 
-    abstract Class<T> getAcceptValueClass();
+    private final HashMap<NominalValue, Integer> m_counts = new HashMap<>();
 
-    abstract int getNumFeatures(T value);
+    private int m_nRows = 0;
 
-    /**
-     *
-     */
-    public AbstractFeatureHandlerFactory() {
-        m_caster = new Caster<T>(getAcceptValueClass(), supportsMissingValues());
+    NominalFeatureStatisticBuilder(final NominalValueAccessor accessor) {
+        CheckUtils.checkNotNull(accessor);
+        m_accessor = accessor;
     }
 
     /**
      * {@inheritDoc}
-     * @throws MissingValueException if a missing value is encountered and missing values are not supported
      */
     @Override
-    public final int numFeatures(final DataCell cell) {
-        final T value = m_caster.getAsT(cell);
-        return getNumFeatures(value);
+    public void consume(final DataCell cell) {
+        m_accessor.accept(cell);
+        final NominalValue val = m_accessor.getValue();
+        m_counts.compute(val, (k, v) -> v == null ? 1 : v + 1);
+        m_nRows++;
     }
 
-    final Caster<T> getCaster() {
-        return m_caster;
-    }
-
-
-
-    abstract static class AbstractFeatureHandler <T extends DataValue> implements FeatureHandler {
-        T m_original;
-
-        T m_sampled;
-
-        private final Caster<T> m_caster;
-
-        AbstractFeatureHandler(final Caster<T> caster) {
-            m_caster = caster;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NominalFeatureStatistic build() {
+        int i = 0;
+        final double n = m_nRows;
+        final double[] distribution = new double[m_counts.size()];
+        final NominalValue[] values = new NominalValue[m_counts.size()];
+        for (Entry<NominalValue, Integer> entry : m_counts.entrySet()) {
+            distribution[i] = entry.getValue() / n;
+            values[i] = entry.getKey();
+            i++;
         }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setOriginal(final DataCell cell) {
-            m_original = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setSampled(final DataCell cell) {
-            m_sampled = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final void reset() {
-            m_original = null;
-            m_sampled = null;
-            resetReplaceState();
-        }
-
+        return new NominalFeatureStatistic(distribution, values);
     }
 
 }

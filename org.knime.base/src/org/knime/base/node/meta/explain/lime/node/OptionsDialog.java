@@ -46,7 +46,7 @@
  * History
  *   14.03.2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.explainer.node;
+package org.knime.base.node.meta.explain.lime.node;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;

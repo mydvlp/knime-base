@@ -44,85 +44,70 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   01.04.2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.feature;
+package org.knime.base.node.meta.explain.lime.colstats;
 
-import org.knime.base.node.meta.explain.util.Caster;
+import org.knime.base.node.meta.explain.lime.colstats.valueaccess.NumericValueAccessor;
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataValue;
-import org.knime.core.data.MissingValueException;
+import org.knime.core.node.util.CheckUtils;
 
-abstract class AbstractFeatureHandlerFactory<T extends DataValue> implements FeatureHandlerFactory {
+/**
+ *
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ */
+final class NumericFeatureStatisticBuilder implements FeatureStatisticBuilder<NumericFeatureStatistic> {
 
-    private final Caster<T> m_caster;
+    private final boolean m_correctSampleBias;
 
-    abstract Class<T> getAcceptValueClass();
+    private final NumericValueAccessor m_accessor;
 
-    abstract int getNumFeatures(T value);
+    private double m_sum;
 
-    /**
-     *
-     */
-    public AbstractFeatureHandlerFactory() {
-        m_caster = new Caster<T>(getAcceptValueClass(), supportsMissingValues());
+    private int m_nRows;
+
+    private double m_squaredSum;
+
+    NumericFeatureStatisticBuilder(final NumericValueAccessor accessor, final boolean correctSampleBias) {
+        CheckUtils.checkNotNull(accessor);
+        m_accessor = accessor;
+        m_correctSampleBias = correctSampleBias;
     }
 
     /**
      * {@inheritDoc}
-     * @throws MissingValueException if a missing value is encountered and missing values are not supported
      */
     @Override
-    public final int numFeatures(final DataCell cell) {
-        final T value = m_caster.getAsT(cell);
-        return getNumFeatures(value);
+    public void consume(final DataCell cell) {
+        m_accessor.accept(cell);
+        final double value = m_accessor.getValue();
+        m_sum += value;
+        m_squaredSum += value * value;
+        m_nRows++;
     }
 
-    final Caster<T> getCaster() {
-        return m_caster;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NumericFeatureStatistic build() {
+        final double mean = calculateMean();
+        final double std = calculateStd(mean);
+        return new NumericFeatureStatistic(mean, std);
     }
 
+    private double calculateMean() {
+        return m_sum / m_nRows;
+    }
 
-
-    abstract static class AbstractFeatureHandler <T extends DataValue> implements FeatureHandler {
-        T m_original;
-
-        T m_sampled;
-
-        private final Caster<T> m_caster;
-
-        AbstractFeatureHandler(final Caster<T> caster) {
-            m_caster = caster;
+    private double calculateStd(final double mean) {
+        final double n = m_nRows;
+        final double squaredMean = m_squaredSum / n;
+        double variance = squaredMean - mean;
+        if (m_correctSampleBias) {
+            variance *= n / (n - 1);
         }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setOriginal(final DataCell cell) {
-            m_original = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setSampled(final DataCell cell) {
-            m_sampled = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final void reset() {
-            m_original = null;
-            m_sampled = null;
-            resetReplaceState();
-        }
-
+        return Math.sqrt(variance);
     }
 
 }

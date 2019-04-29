@@ -44,17 +44,42 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 12, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.explainer;
+package org.knime.base.node.meta.explain.lime.colstats.valueaccess;
 
-import org.knime.core.data.DataRow;
-import org.knime.core.data.vector.bitvector.BitVectorValue;
+import org.knime.base.node.meta.explain.util.Caster;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.NominalValue;
+import org.knime.core.node.util.CheckUtils;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface WeightingKernel {
-    double calculate(final DataRow original, final DataRow perturbed, final BitVectorValue label);
+final class DefaultNominalValueAccessor implements NominalValueAccessor {
+
+    private final Caster<NominalValue> m_caster = new Caster<>(NominalValue.class, false);
+
+    private NominalValue m_value = null;
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void accept(final DataCell cell) {
+        m_value = m_caster.getAsT(cell);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NominalValue getValue() {
+        CheckUtils.checkState(m_value != null,
+            "DefaultNominalValueAccessor#accept has to be called at least once before"
+            + " calling DefaultNominalValueAccessor#getValue.");
+        return m_value;
+    }
+
 }

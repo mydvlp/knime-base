@@ -44,59 +44,39 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   07.03.2019 (adrian): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.explainer.node;
+package org.knime.base.node.meta.explain.lime.colstats.valueaccess;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import org.knime.base.node.meta.explain.util.Caster;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DoubleValue;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public class ModelExplainerLoopStartNodeFactory extends NodeFactory<ModelExplainerLoopStartNodeModel> {
+public final class DoubleValueAccessor implements NumericValueAccessor {
+
+    private final Caster<DoubleValue> m_caster = new Caster<>(DoubleValue.class, false);
+
+    private double m_value = 0;
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ModelExplainerLoopStartNodeModel createNodeModel() {
-        return new ModelExplainerLoopStartNodeModel();
+    public void accept(final DataCell cell) {
+        final DoubleValue value = m_caster.getAsT(cell);
+        m_value = value.getDoubleValue();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<ModelExplainerLoopStartNodeModel> createNodeView(final int viewIndex,
-        final ModelExplainerLoopStartNodeModel nodeModel) {
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new ModelExplainerLoopStartNodeDialogPane();
+    public double getValue() {
+        return m_value;
     }
 
 }

@@ -44,85 +44,52 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   01.04.2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.feature;
+package org.knime.base.node.meta.explain.lime.colstats;
 
-import org.knime.base.node.meta.explain.util.Caster;
+import org.knime.base.node.meta.explain.lime.colstats.valueaccess.BitVectorValueAccessor;
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataValue;
-import org.knime.core.data.MissingValueException;
 
-abstract class AbstractFeatureHandlerFactory<T extends DataValue> implements FeatureHandlerFactory {
+/**
+ *
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ */
+final class BinaryFeatureStatisticBuilder implements FeatureStatisticBuilder<BinaryFeatureStatistic> {
 
-    private final Caster<T> m_caster;
+    private final BitVectorValueAccessor m_accessor;
 
-    abstract Class<T> getAcceptValueClass();
+    private int m_nRows = 0;
 
-    abstract int getNumFeatures(T value);
+    private int m_nOnes = 0;
 
     /**
      *
+     * @param idx in the bit vector
      */
-    public AbstractFeatureHandlerFactory() {
-        m_caster = new Caster<T>(getAcceptValueClass(), supportsMissingValues());
+    BinaryFeatureStatisticBuilder(final BitVectorValueAccessor accessor) {
+        m_accessor = accessor;
     }
 
     /**
      * {@inheritDoc}
-     * @throws MissingValueException if a missing value is encountered and missing values are not supported
      */
     @Override
-    public final int numFeatures(final DataCell cell) {
-        final T value = m_caster.getAsT(cell);
-        return getNumFeatures(value);
+    public void consume(final DataCell cell) {
+        m_accessor.accept(cell);
+        if (m_accessor.isSet()) {
+            m_nOnes++;
+        }
+        m_nRows++;
     }
 
-    final Caster<T> getCaster() {
-        return m_caster;
-    }
-
-
-
-    abstract static class AbstractFeatureHandler <T extends DataValue> implements FeatureHandler {
-        T m_original;
-
-        T m_sampled;
-
-        private final Caster<T> m_caster;
-
-        AbstractFeatureHandler(final Caster<T> caster) {
-            m_caster = caster;
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setOriginal(final DataCell cell) {
-            m_original = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setSampled(final DataCell cell) {
-            m_sampled = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final void reset() {
-            m_original = null;
-            m_sampled = null;
-            resetReplaceState();
-        }
-
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BinaryFeatureStatistic build() {
+        double n = m_nRows;
+        return new BinaryFeatureStatistic(m_nOnes / n);
     }
 
 }

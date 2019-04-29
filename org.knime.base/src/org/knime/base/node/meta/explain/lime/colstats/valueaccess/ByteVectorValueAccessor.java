@@ -44,85 +44,50 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   01.04.2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.feature;
+package org.knime.base.node.meta.explain.lime.colstats.valueaccess;
 
 import org.knime.base.node.meta.explain.util.Caster;
 import org.knime.core.data.DataCell;
-import org.knime.core.data.DataValue;
-import org.knime.core.data.MissingValueException;
+import org.knime.core.data.vector.bytevector.ByteVectorValue;
+import org.knime.core.node.util.CheckUtils;
 
-abstract class AbstractFeatureHandlerFactory<T extends DataValue> implements FeatureHandlerFactory {
+/**
+ * Accesses a single position in a {@link ByteVectorValue}.
+ *
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ */
+final class ByteVectorValueAccessor implements NumericValueAccessor {
 
-    private final Caster<T> m_caster;
+    private final int m_idx;
 
-    abstract Class<T> getAcceptValueClass();
+    private final Caster<ByteVectorValue> m_caster = new Caster<>(ByteVectorValue.class, false);
 
-    abstract int getNumFeatures(T value);
+    private int m_value = -1;
 
-    /**
-     *
-     */
-    public AbstractFeatureHandlerFactory() {
-        m_caster = new Caster<T>(getAcceptValueClass(), supportsMissingValues());
+    ByteVectorValueAccessor(final int idx) {
+        m_idx = idx;
     }
 
     /**
      * {@inheritDoc}
-     * @throws MissingValueException if a missing value is encountered and missing values are not supported
      */
     @Override
-    public final int numFeatures(final DataCell cell) {
-        final T value = m_caster.getAsT(cell);
-        return getNumFeatures(value);
+    public void accept(final DataCell cell) {
+        final ByteVectorValue value = m_caster.getAsT(cell);
+        m_value = value.get(m_idx);
     }
 
-    final Caster<T> getCaster() {
-        return m_caster;
+    @Override
+    public double getValue() {
+        return getByteValue();
     }
 
-
-
-    abstract static class AbstractFeatureHandler <T extends DataValue> implements FeatureHandler {
-        T m_original;
-
-        T m_sampled;
-
-        private final Caster<T> m_caster;
-
-        AbstractFeatureHandler(final Caster<T> caster) {
-            m_caster = caster;
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setOriginal(final DataCell cell) {
-            m_original = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         * @throws MissingValueException
-         */
-        @Override
-        public final void setSampled(final DataCell cell) {
-            m_sampled = m_caster.getAsT(cell);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public final void reset() {
-            m_original = null;
-            m_sampled = null;
-            resetReplaceState();
-        }
-
+    int getByteValue() {
+        CheckUtils.checkState(m_value >= 0,
+        "ByteVectorValueAccessor#accept has to be called at least once before calling ByteVectorValue#getValue.");
+        return m_value;
     }
 
 }

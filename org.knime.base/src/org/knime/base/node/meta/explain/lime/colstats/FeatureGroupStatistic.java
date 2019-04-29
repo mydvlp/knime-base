@@ -44,29 +44,29 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 12, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.explainer;
-
-import org.apache.commons.math3.util.CombinatoricsUtils;
-import org.knime.core.data.DataRow;
-import org.knime.core.data.vector.bitvector.BitVectorValue;
+package org.knime.base.node.meta.explain.lime.colstats;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-class ShapWeightingKernel implements WeightingKernel {
+public final class FeatureGroupStatistic<T> {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double calculate(final DataRow original, final DataRow perturbed, final BitVectorValue replaced) {
-        final int numFeatures = original.getNumCells();
-        final int numPresent = (int)replaced.cardinality();
-        final double mChooseZ = CombinatoricsUtils.binomialCoefficient(numFeatures, numPresent);
-        return (numFeatures - 1) / (mChooseZ * numPresent *(numFeatures - numPresent));
+    final T[] m_featureStatistics;
+    final String m_groupName;
+
+    FeatureGroupStatistic(final T[] featureStatistics, final String groupName) {
+        m_featureStatistics = featureStatistics.clone();
+        m_groupName = groupName;
     }
 
+    public T getFeatureStatistic(final int idx) {
+        return m_featureStatistics[idx];
+    }
+
+    public String getGroupName() {
+        return m_groupName;
+    }
 }
