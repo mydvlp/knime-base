@@ -46,25 +46,51 @@
  * History
  *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
+package org.knime.base.node.meta.explain.lime.colstats.valueaccess;
+
+import org.knime.base.node.meta.explain.util.Caster;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.NominalValue;
+import org.knime.core.data.collection.ListDataValue;
+import org.knime.core.node.util.CheckUtils;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public final class BinaryFeatureStatistic implements FeatureStatistic {
+final class ListNominalValueAccessor implements NominalValueAccessor {
 
-    private final double m_prob;
+    private final int m_idx;
+
+    private final Caster<ListDataValue> m_caster = new Caster<>(ListDataValue.class, false);
+
+    private NominalValue m_value = null;
+
+    ListNominalValueAccessor(final int idx) {
+        m_idx = idx;
+    }
 
     /**
-     *
-     * @param probability of the output being 1
+     * {@inheritDoc}
      */
-    BinaryFeatureStatistic(final double probability) {
-        m_prob = probability;
+    @Override
+    public void accept(final DataCell cell) {
+        final ListDataValue list = m_caster.getAsT(cell);
+        final DataCell element = list.get(m_idx);
+        CheckUtils.checkArgument(element instanceof NominalValue,
+            "Expected nominal value at list index %s but received object of type %s instead.", m_idx,
+            element.getType().getName());
+        m_value = (NominalValue)element;
     }
 
-    public double probability() {
-        return m_prob;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NominalValue getValue() {
+        CheckUtils.checkState(m_value != null,
+            "ListNominalValueAccessor#accept has to be called at least once before calling ListNominalValueAccessor#getValue.");
+        return m_value;
     }
+
 }

@@ -44,27 +44,61 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
+package org.knime.base.node.meta.explain.lime.sample;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.math3.random.RandomDataGenerator;
+import org.knime.base.node.meta.explain.lime.colstats.BinaryFeatureStatistic;
+import org.knime.base.node.meta.explain.util.Caster;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.vector.bitvector.BitVectorValue;
+import org.knime.core.data.vector.bitvector.DenseBitVectorCellFactory;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public final class BinaryFeatureStatistic implements FeatureStatistic {
+final class BitVectorCellSampler implements CellSampler {
 
-    private final double m_prob;
+    private final List<BinaryFeatureStatistic> m_stats;
+    private final Caster<BitVectorValue> m_caster = new Caster<>(BitVectorValue.class, false);
+    private final RandomDataGenerator m_random;
+    private BitVectorValue m_reference = null;
+
+    BitVectorCellSampler(final List<BinaryFeatureStatistic> stats, final long seed) {
+        m_stats = new ArrayList<>(stats);
+        m_random = new RandomDataGenerator();
+        m_random.getRandomGenerator().setSeed(seed);
+    }
 
     /**
-     *
-     * @param probability of the output being 1
+     * {@inheritDoc}
      */
-    BinaryFeatureStatistic(final double probability) {
-        m_prob = probability;
+    @Override
+    public DataInverseCellPair sample() {
+        final DenseBitVectorCellFactory fac = new DenseBitVectorCellFactory(m_stats.size());
+
+        return null;
     }
 
-    public double probability() {
-        return m_prob;
+    private double[] sampleData() {
+        final double[] data = new double[m_stats.size()];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = m_random.nextUniform(0.0, 1.0) >= m_stats.get(i).probability() ? 1.0 : 0.0;
+        }
+        return data;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReference(final DataCell reference) {
+        m_reference = m_caster.getAsT(reference);
+    }
+
 }

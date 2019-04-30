@@ -44,27 +44,15 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
+package org.knime.base.node.meta.explain.lime;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public final class BinaryFeatureStatistic implements FeatureStatistic {
+public class LimeExplanationTask {
 
-    private final double m_prob;
 
-    /**
-     *
-     * @param probability of the output being 1
-     */
-    BinaryFeatureStatistic(final double probability) {
-        m_prob = probability;
-    }
-
-    public double probability() {
-        return m_prob;
-    }
 }

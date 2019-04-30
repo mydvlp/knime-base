@@ -44,27 +44,35 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
+package org.knime.base.node.meta.explain.lime.sample;
+
+import org.knime.core.data.DataCell;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public final class BinaryFeatureStatistic implements FeatureStatistic {
+public class DataInverseCellPair {
 
-    private final double m_prob;
+    private final double[] m_data;
+    private final LimeConverter m_converter;
 
-    /**
-     *
-     * @param probability of the output being 1
-     */
-    BinaryFeatureStatistic(final double probability) {
-        m_prob = probability;
+    public DataInverseCellPair(final double[] normalizedData, final LimeConverter converter) {
+        m_data = normalizedData;
+        m_converter = converter;
     }
 
-    public double probability() {
-        return m_prob;
+    double getValue(final int idx) {
+        return m_data[idx];
+    }
+
+    DataCell getData() {
+        return m_converter.getData(m_data);
+    }
+
+    DataCell getInverse() {
+        return m_converter.getInverse(m_data);
     }
 }

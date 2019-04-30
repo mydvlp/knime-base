@@ -44,27 +44,37 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
+package org.knime.base.node.meta.explain.lime.sample;
+
+import org.knime.core.data.DataRow;
+import org.knime.core.data.append.AppendedColumnRow;
+import org.knime.core.data.def.DoubleCell;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public final class BinaryFeatureStatistic implements FeatureStatistic {
+public class DataInverseRowPair {
 
-    private final double m_prob;
+    private final DataRow m_inverse;
 
-    /**
-     *
-     * @param probability of the output being 1
-     */
-    BinaryFeatureStatistic(final double probability) {
-        m_prob = probability;
+    private final DataRow m_data;
+
+    private final double m_weight;
+
+    public DataInverseRowPair(final DataRow data, final DataRow inverse, final double weight) {
+        m_data = data;
+        m_inverse = inverse;
+        m_weight = weight;
     }
 
-    public double probability() {
-        return m_prob;
+    public DataRow getDataWithWeight() {
+        return new AppendedColumnRow(m_data, new DoubleCell(m_weight));
+    }
+
+    public DataRow getInverse() {
+        return m_inverse;
     }
 }

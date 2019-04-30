@@ -44,53 +44,17 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
+package org.knime.base.node.meta.explain.lime;
 
-import org.knime.base.node.meta.explain.lime.colstats.valueaccess.NumericValueAccessor;
-import org.knime.base.node.meta.explain.util.Caster;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.DoubleValue;
-import org.knime.core.data.collection.ListDataValue;
-import org.knime.core.node.util.CheckUtils;
+import org.knime.core.data.DataRow;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class ListNumericValueAccessor implements NumericValueAccessor {
+public interface Explainer {
 
-    private final int m_idx;
-
-    private final Caster<ListDataValue> m_caster = new Caster<>(ListDataValue.class, false);
-
-    private double m_value;
-
-    ListNumericValueAccessor(final int idx) {
-        m_idx = idx;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void accept(final DataCell cell) {
-        final ListDataValue list = m_caster.getAsT(cell);
-        final DataCell element = list.get(m_idx);
-        CheckUtils.checkArgument(element instanceof DoubleValue,
-            "Expected DoubleValue at list index %s but instead received cell of type %s.", m_idx,
-            element.getType().getName());
-        final DoubleValue dv = (DoubleValue)element;
-        m_value = dv.getDoubleValue();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public double getValue() {
-        return m_value;
-    }
-
+    ExplanationTask createTask(final DataRow roi);
 }

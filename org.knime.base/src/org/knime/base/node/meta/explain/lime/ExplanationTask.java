@@ -42,56 +42,16 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- *
+ * 
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
-
-import org.knime.base.node.meta.explain.lime.colstats.valueaccess.NominalValueAccessor;
-import org.knime.base.node.meta.explain.util.Caster;
-import org.knime.core.data.DataCell;
-import org.knime.core.data.NominalValue;
-import org.knime.core.data.collection.ListDataValue;
-import org.knime.core.node.util.CheckUtils;
+package org.knime.base.node.meta.explain.lime;
 
 /**
- *
+ * 
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class ListNominalValueAccessor implements NominalValueAccessor {
-
-    private final int m_idx;
-
-    private final Caster<ListDataValue> m_caster = new Caster<>(ListDataValue.class, false);
-
-    private NominalValue m_value = null;
-
-    ListNominalValueAccessor(final int idx) {
-        m_idx = idx;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void accept(final DataCell cell) {
-        final ListDataValue list = m_caster.getAsT(cell);
-        final DataCell element = list.get(m_idx);
-        CheckUtils.checkArgument(element instanceof NominalValue,
-            "Expected nominal value at list index %s but received object of type %s instead.", m_idx,
-            element.getType().getName());
-        m_value = (NominalValue)element;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NominalValue getValue() {
-        CheckUtils.checkState(m_value != null,
-            "ListNominalValueAccessor#accept has to be called at least once before calling ListNominalValueAccessor#getValue.");
-        return m_value;
-    }
+public interface ExplanationTask {
 
 }
