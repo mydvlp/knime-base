@@ -46,13 +46,32 @@
  * History
  *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.sample;
+package org.knime.base.node.meta.explain.util.iter;
+
+import java.util.Iterator;
+import java.util.function.Function;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface DoubleIterable {
+public final class StaticMappingIterable<S, T> implements Iterable<T> {
 
-    DoubleIterator iterator();
+    private final Function<S, T> m_mapping;
+
+    private final Iterable<S> m_source;
+
+    public StaticMappingIterable(final Iterable<S> source, final Function<S, T> mapping) {
+        m_mapping = mapping;
+        m_source = source;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<T> iterator() {
+        return new StaticMappingIterator<>(m_source.iterator(), m_mapping);
+    }
+
 }

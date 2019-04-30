@@ -50,6 +50,7 @@ package org.knime.base.node.meta.explain.lime.sample;
 
 import java.util.Collection;
 
+import org.knime.base.node.meta.explain.util.iter.DoubleIterable;
 import org.knime.core.data.DataCell;
 
 /**

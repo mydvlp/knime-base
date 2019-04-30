@@ -64,7 +64,7 @@ final class ListNominalValueAccessor implements NominalValueAccessor {
 
     private final Caster<ListDataValue> m_caster = new Caster<>(ListDataValue.class, false);
 
-    private NominalValue m_value = null;
+    private DataCell m_value = null;
 
     ListNominalValueAccessor(final int idx) {
         m_idx = idx;
@@ -80,14 +80,14 @@ final class ListNominalValueAccessor implements NominalValueAccessor {
         CheckUtils.checkArgument(element instanceof NominalValue,
             "Expected nominal value at list index %s but received object of type %s instead.", m_idx,
             element.getType().getName());
-        m_value = (NominalValue)element;
+        m_value = element;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NominalValue getValue() {
+    public DataCell getValue() {
         CheckUtils.checkState(m_value != null,
             "ListNominalValueAccessor#accept has to be called at least once before calling ListNominalValueAccessor#getValue.");
         return m_value;

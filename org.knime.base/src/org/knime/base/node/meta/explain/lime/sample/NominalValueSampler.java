@@ -44,44 +44,109 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats.valueaccess;
+package org.knime.base.node.meta.explain.lime.sample;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.stream.IntStream;
+
+import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution;
+import org.apache.commons.math3.random.JDKRandomGenerator;
+import org.apache.commons.math3.random.RandomGenerator;
+import org.knime.base.node.meta.explain.lime.colstats.NominalFeatureStatistic;
 import org.knime.base.node.meta.explain.util.Caster;
+import org.knime.base.node.meta.explain.util.iter.DoubleIterator;
+import org.knime.base.node.meta.explain.util.iter.SingletonDoubleIterator;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.NominalValue;
+import org.knime.core.data.def.DoubleCell;
 import org.knime.core.node.util.CheckUtils;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class DefaultNominalValueAccessor implements NominalValueAccessor {
+public class NominalValueSampler implements CellSampler {
+
+    private final NominalFeatureStatistic m_stat;
+
+    private final EnumeratedIntegerDistribution m_idxSampler;
 
     private final Caster<NominalValue> m_caster = new Caster<>(NominalValue.class, false);
 
-    private DataCell m_value = null;
+    private NominalValue m_reference = null;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void accept(final DataCell cell) {
-        // here caster is used to ensure that cell is indeed a NominalValue
-        m_caster.getAsT(cell);
-        m_value = cell;
+    NominalValueSampler(final NominalFeatureStatistic stat, final long seed) {
+        m_stat = stat;
+        RandomGenerator random = new JDKRandomGenerator();
+        random.setSeed(seed);
+        m_idxSampler = new EnumeratedIntegerDistribution(random, IntStream.range(0, stat.getNumValues()).toArray(),
+            stat.getDistribution());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DataCell getValue() {
-        CheckUtils.checkState(m_value != null,
-            "DefaultNominalValueAccessor#accept has to be called at least once before"
-            + " calling DefaultNominalValueAccessor#getValue.");
-        return m_value;
+    public LimeSample sample() {
+        CheckUtils.checkState(m_reference != null, "setReference has to be called before sample can be called.");
+        final int valueIdx = m_idxSampler.sample();
+        final DataCell value = m_stat.getValue(valueIdx);
+        return new NominalLimeSample(value.equals(m_reference), value);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setReference(final DataCell reference) {
+        m_reference = m_caster.getAsT(reference);
+    }
+
+    private static class NominalLimeSample implements LimeSample {
+
+        private static final Collection<DataCell> ONE = Collections.singleton(new DoubleCell(1.0));
+
+        private static final Collection<DataCell> ZERO = Collections.singleton(new DoubleCell(0.0));
+
+        private final double m_dv;
+
+        private final Collection<DataCell> m_data;
+
+        private final DataCell m_inverse;
+
+        NominalLimeSample(final boolean matchesReference, final DataCell value) {
+            m_inverse = value;
+            m_data = matchesReference ? ONE : ZERO;
+            m_dv = matchesReference ? 1.0 : 0.0;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public DoubleIterator iterator() {
+            return new SingletonDoubleIterator(m_dv);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Collection<DataCell> getData() {
+            return m_data;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public DataCell getInverse() {
+            return m_inverse;
+        }
+
     }
 
 }

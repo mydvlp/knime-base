@@ -48,6 +48,8 @@
  */
 package org.knime.base.node.meta.explain.lime.sample;
 
+import org.knime.base.node.meta.explain.util.iter.DoubleIterable;
+
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany

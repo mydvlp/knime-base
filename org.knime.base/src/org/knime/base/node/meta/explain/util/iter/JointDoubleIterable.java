@@ -44,60 +44,90 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
+package org.knime.base.node.meta.explain.util.iter;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-import org.knime.base.node.meta.explain.lime.colstats.valueaccess.NominalValueAccessor;
-import org.knime.core.data.DataCell;
 import org.knime.core.node.util.CheckUtils;
 
 /**
+ * Combines multiple {@link DoubleIterator DoubleIterables} into a joint DoubleIterable.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class NominalFeatureStatisticBuilder implements FeatureStatisticBuilder<NominalFeatureStatistic> {
+public final class JointDoubleIterable implements DoubleIterable {
 
-    private final NominalValueAccessor m_accessor;
+    private final Iterable<DoubleIterable> m_iterables;
 
-    private final HashMap<DataCell, Integer> m_counts = new HashMap<>();
-
-    private int m_nRows = 0;
-
-    NominalFeatureStatisticBuilder(final NominalValueAccessor accessor) {
-        CheckUtils.checkNotNull(accessor);
-        m_accessor = accessor;
+    public JointDoubleIterable(final Iterable<DoubleIterable> iterables) {
+        m_iterables = iterables;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void consume(final DataCell cell) {
-        m_accessor.accept(cell);
-        final DataCell val = m_accessor.getValue();
-        m_counts.compute(val, (k, v) -> v == null ? 1 : v + 1);
-        m_nRows++;
+    public DoubleIterator iterator() {
+        return new JointDoubleIterator(m_iterables.iterator());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NominalFeatureStatistic build() {
-        int i = 0;
-        final double n = m_nRows;
-        final double[] distribution = new double[m_counts.size()];
-        final DataCell[] values = new DataCell[m_counts.size()];
-        for (Entry<DataCell, Integer> entry : m_counts.entrySet()) {
-            distribution[i] = entry.getValue() / n;
-            values[i] = entry.getKey();
-            i++;
+    private static class JointDoubleIterator implements DoubleIterator {
+
+        private final Iterator<DoubleIterable> m_iterableIter;
+        private DoubleIterator m_currentIterator;
+
+        JointDoubleIterator(final Iterator<DoubleIterable> iterableIter) {
+            m_iterableIter = iterableIter;
+            CheckUtils.checkArgument(iterableIter.hasNext(), "The iterable iterator must have at least one element.");
+            m_currentIterator = iterableIter.next().iterator();
         }
-        return new NominalFeatureStatistic(distribution, values);
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public boolean hasNext() {
+            if (m_currentIterator.hasNext()) {
+                // there are still elements left in the current iterator
+                return true;
+            } else if (!m_iterableIter.hasNext()) {
+                // we don't have elements in the current iterator and there are no more iterables left
+                return false;
+            } else {
+                // the current iterator is exhausted but we might have more iterators
+                return setNextNonEmptyIterator();
+            }
+        }
+
+        private boolean setNextNonEmptyIterator() {
+            while (m_iterableIter.hasNext()) {
+                final DoubleIterable iterable = m_iterableIter.next();
+                final DoubleIterator iter = iterable.iterator();
+                if (iter.hasNext()) {
+                    // we found a non-empty iterator
+                    m_currentIterator = iter;
+                    return true;
+                }
+            }
+            // no more non-empty iterators left
+            return false;
+
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public double next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return m_currentIterator.next();
+        }
+
     }
 
 }

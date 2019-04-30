@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.knime.base.node.meta.explain.lime.colstats.NumericFeatureStatistic;
 import org.knime.base.node.meta.explain.util.Caster;
+import org.knime.base.node.meta.explain.util.iter.DoubleIterator;
 import org.knime.core.data.DataCell;
 import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;

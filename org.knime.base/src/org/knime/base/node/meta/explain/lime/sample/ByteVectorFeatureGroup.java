@@ -42,50 +42,83 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
 package org.knime.base.node.meta.explain.lime.sample;
 
-import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.function.Function;
 
-import org.knime.core.node.util.CheckUtils;
+import org.knime.base.node.meta.explain.lime.colstats.NumericFeatureStatistic;
+import org.knime.base.node.meta.explain.util.Caster;
+import org.knime.base.node.meta.explain.util.iter.DoubleIterable;
+import org.knime.base.node.meta.explain.util.iter.DoubleIterator;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.vector.bytevector.ByteVectorValue;
 
-class MappingIterator<S, T> implements Iterator<T> {
+/**
+ *
+ * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ */
+final class ByteVectorFeatureGroup implements FeatureGroup {
 
-    private final Iterator<S> m_sourceIterator;
+    private final List<NumericFeatureStatistic> m_stats;
 
-    private final Iterator<Function<S, T>> m_mappingIterator;
+    private static final Caster<ByteVectorValue> CASTER = new Caster<>(ByteVectorValue.class, false);
 
-    MappingIterator(final Iterator<S> sourceIterator, final Iterator<Function<S, T>> mappingIterator) {
-        m_sourceIterator = sourceIterator;
-        m_mappingIterator = mappingIterator;
+    private final boolean m_sampleAroundReference;
+
+    /**
+     *
+     */
+    ByteVectorFeatureGroup(final List<NumericFeatureStatistic> stats, final boolean sampleAroundReference) {
+        m_stats = stats;
+        m_sampleAroundReference = sampleAroundReference;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean hasNext() {
-        return m_sourceIterator.hasNext();
+    public DoubleIterable mapOriginalCell(final DataCell cell) {
+        final ByteVectorValue bv = CASTER.getAsT(cell);
+        return new DoubleIterable() {
+
+            @Override
+            public DoubleIterator iterator() {
+                return new DoubleIterator() {
+                    int m_idx = -1;
+
+                    @Override
+                    public boolean hasNext() {
+                        return m_idx < bv.length();
+                    }
+
+                    @Override
+                    public double next() {
+                        if (!hasNext()) {
+                            throw new NoSuchElementException();
+                        }
+                        m_idx++;
+                        final double value = bv.get(m_idx);
+                        final NumericFeatureStatistic stat = m_stats.get(m_idx);
+                        return (value - stat.getMean()) / stat.getStd();
+                    }
+
+                };
+            }
+
+        };
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public T next() {
-        if (!hasNext()) {
-            throw new NoSuchElementException();
-        }
-        CheckUtils.checkState(m_mappingIterator.hasNext(),
-            "There is at least one source element left but no more mapping.");
-        final S nextSourceElement = m_sourceIterator.next();
-        final Function<S, T> nextMapping = m_mappingIterator.next();
-        return nextMapping.apply(nextSourceElement);
+    public CellSampler createSampler(final long seed) {
+        return new ByteVectorCellSampler(m_stats, m_sampleAroundReference, seed);
     }
 
 }

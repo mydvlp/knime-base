@@ -46,33 +46,46 @@
  * History
  *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.sample;
+package org.knime.base.node.meta.explain.util.iter;
 
-import org.knime.core.data.DataCell;
+import java.util.NoSuchElementException;
 
 /**
+ * A {@link DoubleIterator} with exactly one element.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public class DataInverseCellPair {
+public final class SingletonDoubleIterator implements DoubleIterator {
 
-    private final double[] m_data;
-    private final LimeConverter m_converter;
+    private boolean m_hasNext = true;
 
-    public DataInverseCellPair(final double[] normalizedData, final LimeConverter converter) {
-        m_data = normalizedData;
-        m_converter = converter;
+    private final double m_value;
+
+    /**
+     * @param value the value to return when next is called
+     */
+    public SingletonDoubleIterator(final double value) {
+        m_value = value;
     }
 
-    double getValue(final int idx) {
-        return m_data[idx];
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasNext() {
+        return m_hasNext;
     }
 
-    DataCell getData() {
-        return m_converter.getData(m_data);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        m_hasNext = false;
+        return m_value;
     }
 
-    DataCell getInverse() {
-        return m_converter.getInverse(m_data);
-    }
 }

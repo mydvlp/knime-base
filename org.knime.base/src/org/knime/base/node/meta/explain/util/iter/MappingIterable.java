@@ -44,60 +44,44 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
+package org.knime.base.node.meta.explain.util.iter;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
-import org.knime.base.node.meta.explain.lime.colstats.valueaccess.NominalValueAccessor;
-import org.knime.core.data.DataCell;
-import org.knime.core.node.util.CheckUtils;
+import java.util.Iterator;
+import java.util.function.Function;
 
 /**
+ * Maps an {@link Iterable} of type S to a {@link Iterable} of type T using an {@link Iterable} of {@link Function mappings}.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ * @param <S> source type
+ * @param <T> target type
  */
-final class NominalFeatureStatisticBuilder implements FeatureStatisticBuilder<NominalFeatureStatistic> {
+public final class MappingIterable<S, T> implements Iterable<T> {
 
-    private final NominalValueAccessor m_accessor;
+    private final Iterable<S> m_sourceIterable;
 
-    private final HashMap<DataCell, Integer> m_counts = new HashMap<>();
+    private final Iterable<Function<S, T>> m_mappingIterable;
 
-    private int m_nRows = 0;
-
-    NominalFeatureStatisticBuilder(final NominalValueAccessor accessor) {
-        CheckUtils.checkNotNull(accessor);
-        m_accessor = accessor;
+    /**
+     * It is the callers responsibility to ensure that <b>sourceIterable</b> and <b>mappingIterable</b> have
+     * the same number of elements.
+     *
+     * @param sourceIterable {@link Iterable} of source elements
+     * @param mappingIterable {@link Iterable} of mappings
+     */
+    public MappingIterable(final Iterable<S> sourceIterable, final Iterable<Function<S, T>> mappingIterable) {
+        m_sourceIterable = sourceIterable;
+        m_mappingIterable = mappingIterable;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void consume(final DataCell cell) {
-        m_accessor.accept(cell);
-        final DataCell val = m_accessor.getValue();
-        m_counts.compute(val, (k, v) -> v == null ? 1 : v + 1);
-        m_nRows++;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NominalFeatureStatistic build() {
-        int i = 0;
-        final double n = m_nRows;
-        final double[] distribution = new double[m_counts.size()];
-        final DataCell[] values = new DataCell[m_counts.size()];
-        for (Entry<DataCell, Integer> entry : m_counts.entrySet()) {
-            distribution[i] = entry.getValue() / n;
-            values[i] = entry.getKey();
-            i++;
-        }
-        return new NominalFeatureStatistic(distribution, values);
+    public Iterator<T> iterator() {
+        return new MappingIterator<>(m_sourceIterable.iterator(), m_mappingIterable.iterator());
     }
 
 }

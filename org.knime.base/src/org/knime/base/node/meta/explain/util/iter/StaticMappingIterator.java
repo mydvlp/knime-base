@@ -46,87 +46,43 @@
  * History
  *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.sample;
+package org.knime.base.node.meta.explain.util.iter;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
-
-import org.knime.core.node.util.CheckUtils;
+import java.util.function.Function;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class JointDoubleIterable implements DoubleIterable {
+public final class StaticMappingIterator<S, T> implements Iterator<T> {
 
-    private final Iterable<DoubleIterable> m_iterables;
+    private final Function<S, T> m_mapping;
 
-    JointDoubleIterable(final Iterable<DoubleIterable> iterables) {
-        m_iterables = iterables;
+    private final Iterator<S> m_source;
+
+    public StaticMappingIterator(final Iterator<S> source, final Function<S, T> mapping) {
+        m_mapping = mapping;
+        m_source = source;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public DoubleIterator iterator() {
-        return new JointDoubleIterator(m_iterables.iterator());
+    public boolean hasNext() {
+        return m_source.hasNext();
     }
 
-    private static class JointDoubleIterator implements DoubleIterator {
-
-        private final Iterator<DoubleIterable> m_iterableIter;
-        private DoubleIterator m_currentIterator;
-
-        JointDoubleIterator(final Iterator<DoubleIterable> iterableIter) {
-            m_iterableIter = iterableIter;
-            CheckUtils.checkArgument(iterableIter.hasNext(), "The iterable iterator must have at least one element.");
-            m_currentIterator = iterableIter.next().iterator();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
         }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public boolean hasNext() {
-            if (m_currentIterator.hasNext()) {
-                // there are still elements left in the current iterator
-                return true;
-            } else if (!m_iterableIter.hasNext()) {
-                // we don't have elements in the current iterator and there are no more iterables left
-                return false;
-            } else {
-                // the current iterator is exhausted but we might have more iterators
-                return setNextNonEmptyIterator();
-            }
-        }
-
-        private boolean setNextNonEmptyIterator() {
-            while (m_iterableIter.hasNext()) {
-                final DoubleIterable iterable = m_iterableIter.next();
-                final DoubleIterator iter = iterable.iterator();
-                if (iter.hasNext()) {
-                    // we found a non-empty iterator
-                    m_currentIterator = iter;
-                    return true;
-                }
-            }
-            // no more non-empty iterators left
-            return false;
-
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public double next() {
-            if (!hasNext()) {
-                throw new NoSuchElementException();
-            }
-            return m_currentIterator.next();
-        }
-
+        return m_mapping.apply(m_source.next());
     }
-
 }

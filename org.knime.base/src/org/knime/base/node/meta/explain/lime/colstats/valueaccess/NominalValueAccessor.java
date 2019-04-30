@@ -48,7 +48,7 @@
  */
 package org.knime.base.node.meta.explain.lime.colstats.valueaccess;
 
-import org.knime.core.data.NominalValue;
+import org.knime.core.data.DataCell;
 
 /**
  *
@@ -56,5 +56,8 @@ import org.knime.core.data.NominalValue;
  */
 public interface NominalValueAccessor extends ValueAccessor {
 
-    NominalValue getValue();
+    /**
+     * @return
+     */
+    DataCell getValue();
 }

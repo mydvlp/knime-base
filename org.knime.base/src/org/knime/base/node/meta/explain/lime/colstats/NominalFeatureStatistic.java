@@ -48,7 +48,7 @@
  */
 package org.knime.base.node.meta.explain.lime.colstats;
 
-import org.knime.core.data.NominalValue;
+import org.knime.core.data.DataCell;
 import org.knime.core.node.util.CheckUtils;
 
 /**
@@ -59,13 +59,13 @@ public class NominalFeatureStatistic implements FeatureStatistic {
 
     private final double[] m_distribution;
 
-    private final NominalValue[] m_values;
+    private final DataCell[] m_values;
 
     /**
      * @param distribution of <b>values</b>
      * @param values nominal values
      */
-    public NominalFeatureStatistic(final double[] distribution, final NominalValue[] values) {
+    public NominalFeatureStatistic(final double[] distribution, final DataCell[] values) {
         CheckUtils.checkArgument(values.length == distribution.length,
             "The value and distribution arrays must have the same length.");
         CheckUtils.checkArgument(values.length > 1,
@@ -78,7 +78,7 @@ public class NominalFeatureStatistic implements FeatureStatistic {
      * @param idx the value index
      * @return the nominal value at index <b>idx</b>
      */
-    public NominalValue getValue(final int idx) {
+    public DataCell getValue(final int idx) {
         return m_values[idx];
     }
 
@@ -87,5 +87,12 @@ public class NominalFeatureStatistic implements FeatureStatistic {
      */
     public double[] getDistribution() {
         return m_distribution.clone();
+    }
+
+    /**
+     * @return the number of unique values contained in this feature
+     */
+    public int getNumValues() {
+        return m_values.length;
     }
 }

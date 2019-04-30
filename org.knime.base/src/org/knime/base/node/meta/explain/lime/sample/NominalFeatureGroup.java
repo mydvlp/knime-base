@@ -44,60 +44,50 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.colstats;
+package org.knime.base.node.meta.explain.lime.sample;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
-import org.knime.base.node.meta.explain.lime.colstats.valueaccess.NominalValueAccessor;
+import org.knime.base.node.meta.explain.lime.colstats.NominalFeatureStatistic;
+import org.knime.base.node.meta.explain.util.iter.DoubleIterable;
+import org.knime.base.node.meta.explain.util.iter.SingletonDoubleIterable;
 import org.knime.core.data.DataCell;
-import org.knime.core.node.util.CheckUtils;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class NominalFeatureStatisticBuilder implements FeatureStatisticBuilder<NominalFeatureStatistic> {
+class NominalFeatureGroup implements FeatureGroup {
 
-    private final NominalValueAccessor m_accessor;
 
-    private final HashMap<DataCell, Integer> m_counts = new HashMap<>();
+    /**
+     *
+     */
+    private static final SingletonDoubleIterable SINGLETON_DOUBLE_ITERABLE = new SingletonDoubleIterable(1.0);
+    private final NominalFeatureStatistic m_stat;
+    private final NominalValueSampler m_sampler;
 
-    private int m_nRows = 0;
-
-    NominalFeatureStatisticBuilder(final NominalValueAccessor accessor) {
-        CheckUtils.checkNotNull(accessor);
-        m_accessor = accessor;
+    NominalFeatureGroup(final NominalFeatureStatistic stat, final long seed) {
+        m_stat = stat;
+        m_sampler = new NominalValueSampler(stat, seed);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void consume(final DataCell cell) {
-        m_accessor.accept(cell);
-        final DataCell val = m_accessor.getValue();
-        m_counts.compute(val, (k, v) -> v == null ? 1 : v + 1);
-        m_nRows++;
+    public DoubleIterable mapOriginalCell(final DataCell cell) {
+        // LIME replaces nominal values with double values for the surrogate model
+        return SINGLETON_DOUBLE_ITERABLE;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NominalFeatureStatistic build() {
-        int i = 0;
-        final double n = m_nRows;
-        final double[] distribution = new double[m_counts.size()];
-        final DataCell[] values = new DataCell[m_counts.size()];
-        for (Entry<DataCell, Integer> entry : m_counts.entrySet()) {
-            distribution[i] = entry.getValue() / n;
-            values[i] = entry.getKey();
-            i++;
-        }
-        return new NominalFeatureStatistic(distribution, values);
+    public LimeSample sample(final DataCell original) {
+        m_sampler.setReference(original);
+        return m_sampler.sample();
     }
 
 }

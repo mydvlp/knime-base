@@ -46,15 +46,26 @@
  * History
  *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.sample;
+package org.knime.base.node.meta.explain.util.iter;
+
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
+ * The equivalent of a generic {@link Iterator} for double values.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface DoubleIterator {
+public interface DoubleIterator {
 
+    /**
+     * @return true if there is another double value left
+     */
     boolean hasNext();
 
+    /**
+     * @return the next double value
+     * @throws NoSuchElementException if no double is left
+     */
     double next();
 }

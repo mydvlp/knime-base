@@ -42,20 +42,26 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- * 
+ *
  * History
  *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
 package org.knime.base.node.meta.explain.lime.colstats;
 
 /**
- * 
+ *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public interface NumericFeatureStatistic {
+public interface NumericFeatureStatistic extends FeatureStatistic {
 
+    /**
+     * @return the mean of the feature
+     */
     double getMean();
 
+    /**
+     * @return the standard deviation of the feature
+     */
     double getStd();
 
 }

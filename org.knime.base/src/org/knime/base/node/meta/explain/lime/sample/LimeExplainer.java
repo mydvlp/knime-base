@@ -48,7 +48,17 @@
  */
 package org.knime.base.node.meta.explain.lime.sample;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
+
+import org.knime.base.node.meta.explain.util.iter.DoubleIterable;
+import org.knime.base.node.meta.explain.util.iter.JointDoubleIterable;
+import org.knime.base.node.meta.explain.util.iter.MappingIterable;
+import org.knime.base.node.meta.explain.util.iter.StaticMappingIterable;
+import org.knime.core.data.DataCell;
+import org.knime.core.data.DataRow;
 
 /**
  *
@@ -58,9 +68,32 @@ public class LimeExplainer {
 
     private List<FeatureGroup> m_featureGroups;
 
+    private int m_numSamples;
 
+    void doStuff(final DataRow roi) {
+        DoubleIterable originalNormalized = normalizeRoi(roi);
+    }
 
+    private DoubleIterable normalizeRoi(final DataRow roi) {
+        final Iterable<Function<DataCell, DoubleIterable>> mappingIterable =
+            new StaticMappingIterable<>(m_featureGroups, f -> f::mapOriginalCell);
+        final Iterable<DoubleIterable> cellDoubleIterables = new MappingIterable<>(roi, mappingIterable);
+        return new JointDoubleIterable(cellDoubleIterables);
+    }
 
-
+    List<LimeSample> drawSample(final DataRow reference) {
+        final List<LimeSample> cellSamples = new ArrayList<>();
+        final Iterator<FeatureGroup> featureGroupIterator = m_featureGroups.iterator();
+        final Iterator<DataCell> referenceIterator = reference.iterator();
+        while (referenceIterator.hasNext()) {
+            assert featureGroupIterator.hasNext();
+            final DataCell referenceCell = referenceIterator.next();
+            final FeatureGroup featureGroup = featureGroupIterator.next();
+            final LimeSample sample = featureGroup.sample(referenceCell);
+            cellSamples.add(sample);
+        }
+        assert !featureGroupIterator.hasNext();
+        return cellSamples;
+    }
 
 }

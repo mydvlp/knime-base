@@ -48,6 +48,7 @@
  */
 package org.knime.base.node.meta.explain.lime.sample;
 
+import org.knime.base.node.meta.explain.util.iter.DoubleIterable;
 import org.knime.core.data.DataCell;
 
 /**
@@ -56,10 +57,8 @@ import org.knime.core.data.DataCell;
  */
 public interface FeatureGroup {
 
-    DoubleIterable map(DataCell cell);
+    DoubleIterable mapOriginalCell(DataCell cell);
 
-    CellSampler createSampler();
-
-    String getName();
+    LimeSample sample(final DataCell original);
 
 }

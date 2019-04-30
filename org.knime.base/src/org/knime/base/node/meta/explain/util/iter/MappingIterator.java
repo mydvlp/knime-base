@@ -46,40 +46,62 @@
  * History
  *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.sample;
+package org.knime.base.node.meta.explain.util.iter;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 
+import org.knime.core.node.util.CheckUtils;
+
 /**
- * Maps iterables of type S to iterables of type T using an iterable of mappings.
+ * Maps an {@link Iterator} of type S to an {@link Iterator} of type T using the {@link Function mappings} provided by
+ * a mapping {@link Iterator}.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
+ * @param <S> source type
+ * @param <T> target type
  */
-final class MappingIterable<S, T> implements Iterable<T> {
+public final class MappingIterator<S, T> implements Iterator<T> {
 
-    private final Iterable<S> m_sourceIterable;
+    private final Iterator<S> m_sourceIterator;
 
-    private final Iterable<Function<S, T>> m_mappingIterable;
+    private final Iterator<Function<S, T>> m_mappingIterator;
 
     /**
-     * It is the callers responsibility to ensure that <b>sourceIterable</b> and <b>mappingIterable</b> have
+     * Creates a {@link MappingIterator} using <b>sourceIterator</b> and <b>mappingIterator</b>.
+     * It is the callers responsibility to ensure that <b>sourceIterator</b> and <b>mappingIterator</b> contain
      * the same number of elements.
      *
-     * @param sourceIterable {@link Iterable} of source elements
-     * @param mappingIterable {@link Iterable} of mappings
+     * @param sourceIterator {@link Iterator} of source elements
+     * @param mappingIterator {@link Iterator} of mappings
      */
-    MappingIterable(final Iterable<S> sourceIterable, final Iterable<Function<S, T>> mappingIterable) {
-        m_sourceIterable = sourceIterable;
-        m_mappingIterable = mappingIterable;
+    public MappingIterator(final Iterator<S> sourceIterator, final Iterator<Function<S, T>> mappingIterator) {
+        m_sourceIterator = sourceIterator;
+        m_mappingIterator = mappingIterator;
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Iterator<T> iterator() {
-        return new MappingIterator<>(m_sourceIterable.iterator(), m_mappingIterable.iterator());
+    public boolean hasNext() {
+        return m_sourceIterator.hasNext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        CheckUtils.checkState(m_mappingIterator.hasNext(),
+            "There is at least one source element left but no more mapping.");
+        final S nextSourceElement = m_sourceIterator.next();
+        final Function<S, T> nextMapping = m_mappingIterator.next();
+        return nextMapping.apply(nextSourceElement);
     }
 
 }
