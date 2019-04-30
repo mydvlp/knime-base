@@ -54,9 +54,12 @@ import org.knime.core.data.DataCell;
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface CellSampler {
+public interface FeatureGroup {
 
-    LimeSample sample();
+    DoubleIterable map(DataCell cell);
 
-    void setReference(final DataCell reference);
+    CellSampler createSampler();
+
+    String getName();
+
 }

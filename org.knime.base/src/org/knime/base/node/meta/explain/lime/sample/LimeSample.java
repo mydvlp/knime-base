@@ -48,19 +48,17 @@
  */
 package org.knime.base.node.meta.explain.lime.sample;
 
+import java.util.Collection;
+
 import org.knime.core.data.DataCell;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface LimeSample {
+interface LimeSample extends DoubleIterable {
 
-    double getNormalized(final int idx);
-
-    int getNumValues();
-
-    DataCell getData();
+    Collection<DataCell> getData();
 
     DataCell getInverse();
 

@@ -42,21 +42,50 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- *
+ * 
  * History
  *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
 package org.knime.base.node.meta.explain.lime.sample;
 
-import org.knime.core.data.DataCell;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.function.Function;
 
-/**
- *
- * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
- */
-interface CellSampler {
+import org.knime.core.node.util.CheckUtils;
 
-    LimeSample sample();
+class MappingIterator<S, T> implements Iterator<T> {
 
-    void setReference(final DataCell reference);
+    private final Iterator<S> m_sourceIterator;
+
+    private final Iterator<Function<S, T>> m_mappingIterator;
+
+    MappingIterator(final Iterator<S> sourceIterator, final Iterator<Function<S, T>> mappingIterator) {
+        m_sourceIterator = sourceIterator;
+        m_mappingIterator = mappingIterator;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean hasNext() {
+        return m_sourceIterator.hasNext();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T next() {
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        CheckUtils.checkState(m_mappingIterator.hasNext(),
+            "There is at least one source element left but no more mapping.");
+        final S nextSourceElement = m_sourceIterator.next();
+        final Function<S, T> nextMapping = m_mappingIterator.next();
+        return nextMapping.apply(nextSourceElement);
+    }
+
 }

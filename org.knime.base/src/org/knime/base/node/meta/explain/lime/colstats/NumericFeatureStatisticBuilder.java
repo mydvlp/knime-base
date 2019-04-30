@@ -56,7 +56,7 @@ import org.knime.core.node.util.CheckUtils;
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-final class NumericFeatureStatisticBuilder implements FeatureStatisticBuilder<NumericFeatureStatistic> {
+final class NumericFeatureStatisticBuilder implements FeatureStatisticBuilder<DefaultNumericFeatureStatistic> {
 
     private final boolean m_correctSampleBias;
 
@@ -93,7 +93,7 @@ final class NumericFeatureStatisticBuilder implements FeatureStatisticBuilder<Nu
     public NumericFeatureStatistic build() {
         final double mean = calculateMean();
         final double std = calculateStd(mean);
-        return new NumericFeatureStatistic(mean, std);
+        return new DefaultNumericFeatureStatistic(mean, std);
     }
 
     private double calculateMean() {

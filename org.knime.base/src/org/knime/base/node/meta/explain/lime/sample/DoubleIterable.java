@@ -48,15 +48,11 @@
  */
 package org.knime.base.node.meta.explain.lime.sample;
 
-import org.knime.core.data.DataCell;
-
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface CellSampler {
+interface DoubleIterable {
 
-    LimeSample sample();
-
-    void setReference(final DataCell reference);
+    DoubleIterator iterator();
 }

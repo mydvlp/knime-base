@@ -48,15 +48,38 @@
  */
 package org.knime.base.node.meta.explain.lime.sample;
 
-import org.knime.core.data.DataCell;
+import java.util.Iterator;
+import java.util.function.Function;
 
 /**
+ * Maps iterables of type S to iterables of type T using an iterable of mappings.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface CellSampler {
+final class MappingIterable<S, T> implements Iterable<T> {
 
-    LimeSample sample();
+    private final Iterable<S> m_sourceIterable;
 
-    void setReference(final DataCell reference);
+    private final Iterable<Function<S, T>> m_mappingIterable;
+
+    /**
+     * It is the callers responsibility to ensure that <b>sourceIterable</b> and <b>mappingIterable</b> have
+     * the same number of elements.
+     *
+     * @param sourceIterable {@link Iterable} of source elements
+     * @param mappingIterable {@link Iterable} of mappings
+     */
+    MappingIterable(final Iterable<S> sourceIterable, final Iterable<Function<S, T>> mappingIterable) {
+        m_sourceIterable = sourceIterable;
+        m_mappingIterable = mappingIterable;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterator<T> iterator() {
+        return new MappingIterator<>(m_sourceIterable.iterator(), m_mappingIterable.iterator());
+    }
+
 }

@@ -49,14 +49,18 @@
 package org.knime.base.node.meta.explain.lime.sample;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 import org.apache.commons.math3.random.RandomDataGenerator;
 import org.knime.base.node.meta.explain.lime.colstats.NumericFeatureStatistic;
 import org.knime.base.node.meta.explain.util.Caster;
 import org.knime.core.data.DataCell;
+import org.knime.core.data.def.DoubleCell;
 import org.knime.core.data.vector.bytevector.ByteVectorValue;
-import org.knime.core.data.vector.bytevector.DenseByteVectorCell;
 import org.knime.core.data.vector.bytevector.DenseByteVectorCellFactory;
 import org.knime.core.node.util.CheckUtils;
 
@@ -76,8 +80,8 @@ public class ByteVectorCellSampler implements CellSampler {
 
     private ByteVectorValue m_reference = null;
 
-
-    ByteVectorCellSampler(final List<NumericFeatureStatistic> stats, final boolean sampleAroundReference, final long seed) {
+    ByteVectorCellSampler(final List<NumericFeatureStatistic> stats, final boolean sampleAroundReference,
+        final long seed) {
         m_stats = new ArrayList<>(stats);
         m_sampleAroundReference = sampleAroundReference;
         m_random = new RandomDataGenerator();
@@ -88,10 +92,9 @@ public class ByteVectorCellSampler implements CellSampler {
      * {@inheritDoc}
      */
     @Override
-    public DataInverseCellPair sample() {
+    public LimeSample sample() {
         final double[] data = createData();
-        final DenseByteVectorCell cell = convert(data);
-        return new DataInverseCellPair(cell, data);
+        return new ByteVectorLimeSample(data);
     }
 
     /**
@@ -102,8 +105,8 @@ public class ByteVectorCellSampler implements CellSampler {
         m_reference = m_caster.getAsT(reference);
     }
 
-    private double[][] createData() {
-        final double[][] dataAndDifferences = new double[m_stats.size()][2];
+    private double[] createData() {
+        final double[] data = new double[m_stats.size()];
         for (int i = 0; i < m_stats.size(); i++) {
             double sample = m_random.nextGaussian(0.0, 1.0);
             final NumericFeatureStatistic stat = m_stats.get(i);
@@ -119,25 +122,6 @@ public class ByteVectorCellSampler implements CellSampler {
         return data;
     }
 
-    private DenseByteVectorCell convert(final double[] data) {
-        final DenseByteVectorCellFactory factory = new DenseByteVectorCellFactory(data.length);
-        for (int i = 0; i < data.length; i++) {
-            factory.setValue(i, toByte(data[i]));
-        }
-        return factory.createDataCell();
-    }
-
-    private int toByte(final double value) {
-        final long rounded = Math.round(value);
-        if (rounded > 255) {
-            return 255;
-        } else if (rounded < 0) {
-            return 0;
-        } else {
-            return (int)rounded;
-        }
-    }
-
     private class ByteVectorLimeSample implements LimeSample {
 
         private final double[] m_data;
@@ -150,19 +134,11 @@ public class ByteVectorCellSampler implements CellSampler {
          * {@inheritDoc}
          */
         @Override
-        public double getNormalized(final int idx) {
-            final NumericFeatureStatistic stat = m_stats.get(idx);
-            final double mean = stat.getMean();
-            final double std = stat.getStd();
-            final double value = m_data[idx];
-            return (value - mean) / std;
+        public Collection<DataCell> getData() {
+            return Arrays.stream(m_data).mapToObj(DoubleCell::new).collect(Collectors.toCollection(ArrayList::new));
         }
 
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public int getNumValues() {
+        private int size() {
             return m_data.length;
         }
 
@@ -170,19 +146,53 @@ public class ByteVectorCellSampler implements CellSampler {
          * {@inheritDoc}
          */
         @Override
-        public DataCell getData() {
-            return ;
+        public DataCell getInverse() {
+            final DenseByteVectorCellFactory factory = new DenseByteVectorCellFactory(size());
+            for (int i = 0; i < size(); i++) {
+                factory.setValue(i, toByte(m_data[i]));
+            }
+            return factory.createDataCell();
         }
+
+
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public DataCell getInverse() {
-            // TODO Auto-generated method stub
-            return null;
+        public DoubleIterator iterator() {
+            return new DoubleIterator() {
+                int m_idx = -1;
+
+                @Override
+                public boolean hasNext() {
+                    return m_idx < m_data.length;
+                }
+
+                @Override
+                public double next() {
+                    if (!hasNext()) {
+                        throw new NoSuchElementException();
+                    }
+                    m_idx++;
+                    return m_data[m_idx];
+                }
+
+            };
         }
 
+
+    }
+
+    private static int toByte(final double value) {
+        final long rounded = Math.round(value);
+        if (rounded > 255) {
+            return 255;
+        } else if (rounded < 0) {
+            return 0;
+        } else {
+            return (int)rounded;
+        }
     }
 
 }

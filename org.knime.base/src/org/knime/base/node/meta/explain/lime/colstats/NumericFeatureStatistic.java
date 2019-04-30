@@ -42,32 +42,20 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * ---------------------------------------------------------------------
- *
+ * 
  * History
- *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
 package org.knime.base.node.meta.explain.lime.colstats;
 
 /**
- *
+ * 
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-public final class NumericFeatureStatistic implements FeatureStatistic {
+public interface NumericFeatureStatistic {
 
-    private final double m_mean;
+    double getMean();
 
-    private final double m_std;
+    double getStd();
 
-    NumericFeatureStatistic(final double mean, final double std) {
-        m_mean = mean;
-        m_std = std;
-    }
-
-    public double getMean() {
-        return m_mean;
-    }
-
-    public double getStd() {
-        return m_std;
-    }
 }

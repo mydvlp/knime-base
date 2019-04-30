@@ -46,17 +46,34 @@
  * History
  *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.sample;
-
-import org.knime.core.data.DataCell;
+package org.knime.base.node.meta.explain.lime.colstats;
 
 /**
+ * Dummy implementation used in LIME to normalize the dummy variable replacements of
+ * nominal columns.
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface CellSampler {
+public enum DummyNominalNumericFeatureStatistic implements NumericFeatureStatistic {
+        /**
+         * Instance of this singleton.
+         */
+        INSTANCE;
 
-    LimeSample sample();
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getMean() {
+        return 0;
+    }
 
-    void setReference(final DataCell reference);
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getStd() {
+        return 1.0;
+    }
+
 }

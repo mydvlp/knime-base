@@ -44,19 +44,38 @@
  * ---------------------------------------------------------------------
  *
  * History
- *   Apr 30, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
+ *   Apr 29, 2019 (Adrian Nembach, KNIME GmbH, Konstanz, Germany): created
  */
-package org.knime.base.node.meta.explain.lime.sample;
-
-import org.knime.core.data.DataCell;
+package org.knime.base.node.meta.explain.lime.colstats;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface CellSampler {
+public final class DefaultNumericFeatureStatistic implements FeatureStatistic, NumericFeatureStatistic {
 
-    LimeSample sample();
+    private final double m_mean;
 
-    void setReference(final DataCell reference);
+    private final double m_std;
+
+    DefaultNumericFeatureStatistic(final double mean, final double std) {
+        m_mean = mean;
+        m_std = std;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getMean() {
+        return m_mean;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public double getStd() {
+        return m_std;
+    }
 }

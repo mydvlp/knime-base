@@ -48,15 +48,19 @@
  */
 package org.knime.base.node.meta.explain.lime.sample;
 
-import org.knime.core.data.DataCell;
+import java.util.List;
 
 /**
  *
  * @author Adrian Nembach, KNIME GmbH, Konstanz, Germany
  */
-interface CellSampler {
+public class LimeExplainer {
 
-    LimeSample sample();
+    private List<FeatureGroup> m_featureGroups;
 
-    void setReference(final DataCell reference);
+
+
+
+
+
 }
