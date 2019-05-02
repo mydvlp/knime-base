@@ -41,61 +41,62 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  */
 package org.knime.base.node.mine.pca;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import org.knime.core.node.NodeSettingsRO;
+import org.knime.core.node.NotConfigurableException;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.port.PortObjectSpec;
 
 /**
- * factory for pca inversion node.
- * 
+ * Node dialog for PCA predictor node.
+ *
  * @author uwe, University of Konstanz
+ * @deprecated
  */
-public class PCAReverseNodeFactory extends NodeFactory<PCAReverseNodeModel> {
+@Deprecated
+public class PCAApplyNodeDialog extends DefaultNodeSettingsPane {
+	// private String[] m_dimensionChoices;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected NodeDialogPane createNodeDialogPane() {
-        return new PCAReverseNodeDialog();
-    }
+	private final SettingsModelPCADimensions m_pcaModel;
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public PCAReverseNodeModel createNodeModel() {
+	private final DialogComponentChoiceConfig m_pcaConfig;
 
-        return new PCAReverseNodeModel();
-    }
+	/**
+	 * construct dialog.
+	 */
+	public PCAApplyNodeDialog() {
+		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
+				PCANodeModel.FAIL_MISSING, false),
+				"Fail if missing values are encountered (skipped by default)"));
+		m_pcaModel =
+ new SettingsModelPCADimensions(
+				PCAApplyNodeModel.MIN_QUALPRESERVATION, 2, 100, false);
+		m_pcaConfig = new DialogComponentChoiceConfig(m_pcaModel, true);
+		addDialogComponent(m_pcaConfig);
+		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
+				PCAApplyNodeModel.REMOVE_COLUMNS, false),
+				"Remove original data columns"));
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public NodeView<PCAReverseNodeModel> createNodeView(
-            final int viewIndex, final PCAReverseNodeModel nodeModel) {
-        return null;
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void loadAdditionalSettingsFrom(final NodeSettingsRO settings,
+			final PortObjectSpec[] specs) throws NotConfigurableException {
+		super.loadAdditionalSettingsFrom(settings, specs);
+		if (specs != null && specs[PCAApplyNodeModel.MODEL_INPORT] != null) {
+			final PCAModelPortObjectSpec modelPort =
+				(PCAModelPortObjectSpec)specs[PCAApplyNodeModel.MODEL_INPORT];
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected boolean hasDialog() {
-        return true;
-    }
+			m_pcaModel.setEigenValues(modelPort.getEigenValues());
+			m_pcaConfig.updateComponent();
+		}
+	}
 
 }

@@ -41,47 +41,66 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  * History
  *   04.10.2006 (uwe): created
  */
 package org.knime.base.node.mine.pca;
 
-import org.knime.core.data.DoubleValue;
-import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
-import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
-import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter;
-import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
+import org.knime.core.node.NodeDialogPane;
+import org.knime.core.node.NodeFactory;
+import org.knime.core.node.NodeView;
 
 /**
- * Node dialog for PCA Learner.
- * 
- * @author Uwe Nagel, University of Konstanz
- * 
+ * Factory for PCA learner node.
+ *
+ * @author uwe
+ * @deprecated
  */
-public class PCAComputeNodeDialog extends DefaultNodeSettingsPane {
+@Deprecated
+public class PCAComputeNodeFactory extends NodeFactory<PCAComputeNodeModel> {
+
     /**
-     * Constructor: create NodeDialog with one combo box.
+     * {@inheritDoc}
      */
-    public PCAComputeNodeDialog() {
+    @Override
+    protected NodeDialogPane createNodeDialogPane() {
 
-        super();
-
-        // create a combo box that reads the normalization type for the pca
-        // DialogComponentStringSelection emissColumnSelector = new
-        // DialogComponentStringSelection(new SettingsModelStringArray()
-        // PCANodeModel.NORMALIZATION_TYPE_KEY, "Normalization type:",
-        // PCANodeModel.NORMALIZATION_TYPE_LIST);
-        // addDialogComponent(new DialogComponentNumber(new
-        // SettingsModelInteger(
-        // PCANodeModel.RESULT_DIMENSIONS, 2), "dimensions to reduce to",
-        // 1));
-        addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
-                PCANodeModel.FAIL_MISSING, false),
-                "Fail if missing values are encountered (skipped per default)"));
-        addDialogComponent(new DialogComponentColumnFilter(
-                new SettingsModelFilterString(PCANodeModel.INPUT_COLUMNS),
-                PCAComputeNodeModel.DATA_INPORT, DoubleValue.class));
+        return new PCAComputeNodeDialog();
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public PCAComputeNodeModel createNodeModel() {
+
+        return new PCAComputeNodeModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public NodeView<PCAComputeNodeModel> createNodeView(final int viewIndex,
+            final PCAComputeNodeModel nodeModel) {
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected int getNrNodeViews() {
+        return 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    protected boolean hasDialog() {
+        return true;
+    }
+
 }

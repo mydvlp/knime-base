@@ -66,15 +66,18 @@ import org.knime.core.node.InvalidSettingsException;
 import org.knime.core.node.NotConfigurableException;
 import org.knime.core.node.defaultnodesettings.DialogComponent;
 import org.knime.core.node.port.PortObjectSpec;
+
 /**
- * Implementation of a dialog component for dimension selection in PCA
- * configuration, used for {@link SettingsModelPCADimensions}.
+ * Implementation of a dialog component for dimension selection in PCA configuration, used for
+ * {@link SettingsModelPCADimensions}.
  *
- * Selection of either a number of dimensions to reduce to or a minimal amount
- * of information to be preserved by the dimension reduction.
+ * Selection of either a number of dimensions to reduce to or a minimal amount of information to be preserved by the
+ * dimension reduction.
  *
  * @author Uwe Nagel, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class DialogComponentChoiceConfig extends DialogComponent {
 
     /** spinner for setting dimensions. */

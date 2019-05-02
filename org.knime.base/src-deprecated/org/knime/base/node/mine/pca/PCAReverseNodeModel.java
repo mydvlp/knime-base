@@ -82,7 +82,9 @@ import Jama.Matrix;
  * Invert PCA transformation to transform data back to original space.
  *
  * @author Uwe Nagel, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class PCAReverseNodeModel extends NodeModel {
     /**
      * config string determining of columns with pca coordinates shall be removed.
@@ -168,7 +170,7 @@ public class PCAReverseNodeModel extends NodeModel {
 
         }
         final String[] origColumnNames =
-            ((PCAModelPortObjectSpec)((PCAModelPortObject)inData[MODEL_INPORT]).getSpec()).getColumnNames();
+            ((PCAModelPortObject)inData[MODEL_INPORT]).getSpec().getColumnNames();
         final DataColumnSpec[] specs =
             createAddTableSpec((DataTableSpec)inData[DATA_INPORT].getSpec(), origColumnNames);
 

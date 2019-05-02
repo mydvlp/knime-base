@@ -1,4 +1,4 @@
-/* 
+/*
  * ------------------------------------------------------------------------
  *  Copyright by KNIME AG, Zurich, Switzerland
  *  Website: http://www.knime.com; Email: contact@knime.com
@@ -41,58 +41,58 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  */
 package org.knime.base.node.mine.pca;
 
-import org.knime.core.node.NodeDialogPane;
-import org.knime.core.node.NodeFactory;
-import org.knime.core.node.NodeView;
+import org.knime.core.data.DoubleValue;
+import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
+import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter;
+import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
+import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 
 /**
- * Factory class for the PCA Node.
- * 
- * @author Uwe Nagel, University of Konstanz
+ * Dialog for pca inversion.
+ *
+ * @author uwe, University of Konstanz
+ * @deprecated
  */
-public class PCANodeFactory extends NodeFactory<PCANodeModel> {
+@Deprecated
+public class PCAReverseNodeDialog extends DefaultNodeSettingsPane {
     /**
-     * {@inheritDoc}
+     * create dialog.
      */
-    @Override
-    public NodeDialogPane createNodeDialogPane() {
-        return new PCANodeDialog();
+    public PCAReverseNodeDialog() {
+        createPanel(PCAReverseNodeModel.PCA_COLUMNS, PCAReverseNodeModel.REMOVE_PCACOLS, "PCA");
     }
 
     /**
-     * {@inheritDoc}
+     * Constructor.
+     *
+     * @param colKey the selected columns settings model key
+     * @param remColKey the remove columns settings model key
+     * @param task the task name, e.g., PCA or LDA
+     * @since 3.8
      */
-    @Override
-    public PCANodeModel createNodeModel() {
-        return new PCANodeModel();
+    protected PCAReverseNodeDialog(final String colKey, final String remColKey, final String task) {
+        createPanel(colKey, remColKey, task);
     }
 
     /**
-     * {@inheritDoc}
+     * Creates the panel using the given keys and task name.
+     *
+     * @param colKey the selected columns settings model key
+     * @param remColKey the remove columns settings model key
+     * @param task the task name, e.g., PCA or LDA
      */
-    @Override
-    public NodeView<PCANodeModel> createNodeView(final int viewIndex,
-            final PCANodeModel nodeModel) {
-        return null;
+    private void createPanel(final String colKey, final String remColKey, final String task) {
+        addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(PCANodeModel.FAIL_MISSING, false),
+            "Fail if missing values are encountered (skipped per default)"));
+        addDialogComponent(
+            new DialogComponentBoolean(new SettingsModelBoolean(remColKey, false), "Remove " + task + " columns"));
+        addDialogComponent(new DialogComponentColumnFilter(new SettingsModelFilterString(colKey),
+            PCAReverseNodeModel.DATA_INPORT, DoubleValue.class));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int getNrNodeViews() {
-        return 0;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasDialog() {
-        return true;
-    }
 }

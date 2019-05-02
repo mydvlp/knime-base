@@ -55,30 +55,34 @@ import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
 import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 
 /**
- * Dialog for the PCA node.
+ * Node dialog for PCA Learner.
  *
  * @author Uwe Nagel, University of Konstanz
+ * @deprecated
  */
-public class PCANodeDialog extends DefaultNodeSettingsPane {
-
+@Deprecated
+public class PCAComputeNodeDialog extends DefaultNodeSettingsPane {
     /**
      * Constructor: create NodeDialog with one combo box.
      */
-    public PCANodeDialog() {
+    public PCAComputeNodeDialog() {
 
         super();
+
+        // create a combo box that reads the normalization type for the pca
+        // DialogComponentStringSelection emissColumnSelector = new
+        // DialogComponentStringSelection(new SettingsModelStringArray()
+        // PCANodeModel.NORMALIZATION_TYPE_KEY, "Normalization type:",
+        // PCANodeModel.NORMALIZATION_TYPE_LIST);
+        // addDialogComponent(new DialogComponentNumber(new
+        // SettingsModelInteger(
+        // PCANodeModel.RESULT_DIMENSIONS, 2), "dimensions to reduce to",
+        // 1));
         addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
                 PCANodeModel.FAIL_MISSING, false),
                 "Fail if missing values are encountered (skipped per default)"));
-        addDialogComponent(new DialogComponentChoiceConfig(
-                new SettingsModelPCADimensions(
-                        PCANodeModel.DIMENSIONS_SELECTION, 2, 100, false), false));
-        addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
-                PCANodeModel.REMOVE_COLUMNS, false),
-                "Remove original data columns"));
-
         addDialogComponent(new DialogComponentColumnFilter(
                 new SettingsModelFilterString(PCANodeModel.INPUT_COLUMNS),
-                PCANodeModel.DATA_INPORT, DoubleValue.class));
+                PCAComputeNodeModel.DATA_INPORT, DoubleValue.class));
     }
 }

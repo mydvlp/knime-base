@@ -61,11 +61,13 @@ import org.knime.core.node.defaultnodesettings.SettingsModel;
 import org.knime.core.node.port.PortObjectSpec;
 
 /**
- * Settings model, where either an integer (like number of dimensions) or a
- * double like reproduction percentage can be chosen.
+ * Settings model, where either an integer (like number of dimensions) or a double like reproduction percentage can be
+ * chosen.
  *
  * @author Uwe Nagel, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class SettingsModelPCADimensions extends SettingsModel {
 
     /** eigenvalues smaller than <code>epsilon</code> are considered to

@@ -55,9 +55,11 @@ import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 
 /**
- * This class describes an eigenvalue - eigenvector pair, comparable by absolute
- * of eigenvalue.
+ * This class describes an eigenvalue - eigenvector pair, comparable by absolute of eigenvalue.
+ *
+ * @deprecated
  */
+@Deprecated
 public class EigenValue implements Comparable<EigenValue> {
     /** eigenvalue. */
     private final Double m_value;

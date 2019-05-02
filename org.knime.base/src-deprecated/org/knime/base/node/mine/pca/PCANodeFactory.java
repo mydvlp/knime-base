@@ -41,7 +41,7 @@
  *  may freely choose the license terms applicable to such Node, including
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
- * 
+ *
  */
 package org.knime.base.node.mine.pca;
 
@@ -50,35 +50,35 @@ import org.knime.core.node.NodeFactory;
 import org.knime.core.node.NodeView;
 
 /**
- * Factory class for PCA predictor.
- * 
- * @author uwe, University of Konstanz
+ * Factory class for the PCA Node.
+ *
+ * @author Uwe Nagel, University of Konstanz
+ * @deprecated
  */
-public class PCAApplyNodeFactory extends NodeFactory<PCAApplyNodeModel> {
-
+@Deprecated
+public class PCANodeFactory extends NodeFactory<PCANodeModel> {
     /**
      * {@inheritDoc}
      */
     @Override
-    protected NodeDialogPane createNodeDialogPane() {
-
-        return new PCAApplyNodeDialog();
+    public NodeDialogPane createNodeDialogPane() {
+        return new PCANodeDialog();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public PCAApplyNodeModel createNodeModel() {
-        return new PCAApplyNodeModel();
+    public PCANodeModel createNodeModel() {
+        return new PCANodeModel();
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public NodeView<PCAApplyNodeModel> createNodeView(
-            final int viewIndex, final PCAApplyNodeModel nodeModel) {
+    public NodeView<PCANodeModel> createNodeView(final int viewIndex,
+            final PCANodeModel nodeModel) {
         return null;
     }
 
@@ -86,7 +86,7 @@ public class PCAApplyNodeFactory extends NodeFactory<PCAApplyNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    protected int getNrNodeViews() {
+    public int getNrNodeViews() {
         return 0;
     }
 
@@ -94,9 +94,7 @@ public class PCAApplyNodeFactory extends NodeFactory<PCAApplyNodeModel> {
      * {@inheritDoc}
      */
     @Override
-    protected boolean hasDialog() {
-
+    public boolean hasDialog() {
         return true;
     }
-
 }

@@ -42,59 +42,45 @@
  *  when such Node is propagated with or for interoperation with KNIME.
  * -------------------------------------------------------------------
  *
+ * History
+ *   04.10.2006 (uwe): created
  */
 package org.knime.base.node.mine.pca;
 
-import org.knime.core.node.NodeSettingsRO;
-import org.knime.core.node.NotConfigurableException;
+import org.knime.core.data.DoubleValue;
 import org.knime.core.node.defaultnodesettings.DefaultNodeSettingsPane;
 import org.knime.core.node.defaultnodesettings.DialogComponentBoolean;
+import org.knime.core.node.defaultnodesettings.DialogComponentColumnFilter;
 import org.knime.core.node.defaultnodesettings.SettingsModelBoolean;
-import org.knime.core.node.port.PortObjectSpec;
+import org.knime.core.node.defaultnodesettings.SettingsModelFilterString;
 
 /**
- * Node dialog for PCA predictor node.
+ * Dialog for the PCA node.
  *
- * @author uwe, University of Konstanz
+ * @author Uwe Nagel, University of Konstanz
+ * @deprecated
  */
-public class PCAApplyNodeDialog extends DefaultNodeSettingsPane {
-	// private String[] m_dimensionChoices;
+@Deprecated
+public class PCANodeDialog extends DefaultNodeSettingsPane {
 
-	private final SettingsModelPCADimensions m_pcaModel;
+    /**
+     * Constructor: create NodeDialog with one combo box.
+     */
+    public PCANodeDialog() {
 
-	private final DialogComponentChoiceConfig m_pcaConfig;
+        super();
+        addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
+                PCANodeModel.FAIL_MISSING, false),
+                "Fail if missing values are encountered (skipped per default)"));
+        addDialogComponent(new DialogComponentChoiceConfig(
+                new SettingsModelPCADimensions(
+                        PCANodeModel.DIMENSIONS_SELECTION, 2, 100, false), false));
+        addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
+                PCANodeModel.REMOVE_COLUMNS, false),
+                "Remove original data columns"));
 
-	/**
-	 * construct dialog.
-	 */
-	public PCAApplyNodeDialog() {
-		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
-				PCANodeModel.FAIL_MISSING, false),
-				"Fail if missing values are encountered (skipped by default)"));
-		m_pcaModel =
- new SettingsModelPCADimensions(
-				PCAApplyNodeModel.MIN_QUALPRESERVATION, 2, 100, false);
-		m_pcaConfig = new DialogComponentChoiceConfig(m_pcaModel, true);
-		addDialogComponent(m_pcaConfig);
-		addDialogComponent(new DialogComponentBoolean(new SettingsModelBoolean(
-				PCAApplyNodeModel.REMOVE_COLUMNS, false),
-				"Remove original data columns"));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void loadAdditionalSettingsFrom(final NodeSettingsRO settings,
-			final PortObjectSpec[] specs) throws NotConfigurableException {
-		super.loadAdditionalSettingsFrom(settings, specs);
-		if (specs != null && specs[PCAApplyNodeModel.MODEL_INPORT] != null) {
-			final PCAModelPortObjectSpec modelPort =
-				(PCAModelPortObjectSpec)specs[PCAApplyNodeModel.MODEL_INPORT];
-
-			m_pcaModel.setEigenValues(modelPort.getEigenValues());
-			m_pcaConfig.updateComponent();
-		}
-	}
-
+        addDialogComponent(new DialogComponentColumnFilter(
+                new SettingsModelFilterString(PCANodeModel.INPUT_COLUMNS),
+                PCANodeModel.DATA_INPORT, DoubleValue.class));
+    }
 }

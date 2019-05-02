@@ -74,7 +74,9 @@ import Jama.Matrix;
  * Node for PCA learning.
  *
  * @author uwe, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class PCAComputeNodeModel extends NodeModel {
 
     /** Index of input data port. */

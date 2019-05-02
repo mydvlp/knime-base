@@ -74,6 +74,126 @@
             </message_arguments>
         </filter>
     </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/DialogComponentChoiceConfig.java" type="org.knime.base.node.mine.pca.DialogComponentChoiceConfig">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.DialogComponentChoiceConfig"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/EigenValue.java" type="org.knime.base.node.mine.pca.EigenValue">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.EigenValue"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCAApplyNodeDialog.java" type="org.knime.base.node.mine.pca.PCAApplyNodeDialog">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCAApplyNodeDialog"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCAApplyNodeFactory.java" type="org.knime.base.node.mine.pca.PCAApplyNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCAApplyNodeFactory"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCAApplyNodeModel.java" type="org.knime.base.node.mine.pca.PCAApplyNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCAApplyNodeModel"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCAComputeNodeDialog.java" type="org.knime.base.node.mine.pca.PCAComputeNodeDialog">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCAComputeNodeDialog"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCAComputeNodeFactory.java" type="org.knime.base.node.mine.pca.PCAComputeNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCAComputeNodeFactory"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCAComputeNodeModel.java" type="org.knime.base.node.mine.pca.PCAComputeNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCAComputeNodeModel"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCANodeDialog.java" type="org.knime.base.node.mine.pca.PCANodeDialog">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCANodeDialog"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCANodeFactory.java" type="org.knime.base.node.mine.pca.PCANodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCANodeFactory"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCANodeModel.java" type="org.knime.base.node.mine.pca.PCANodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCANodeModel"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCAReverseNodeDialog.java" type="org.knime.base.node.mine.pca.PCAReverseNodeDialog">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCAReverseNodeDialog"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCAReverseNodeFactory.java" type="org.knime.base.node.mine.pca.PCAReverseNodeFactory">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCAReverseNodeFactory"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/PCAReverseNodeModel.java" type="org.knime.base.node.mine.pca.PCAReverseNodeModel">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.PCAReverseNodeModel"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
+    <resource path="src-deprecated/org/knime/base/node/mine/pca/SettingsModelPCADimensions.java" type="org.knime.base.node.mine.pca.SettingsModelPCADimensions">
+        <filter id="305365105">
+            <message_arguments>
+                <message_argument value="org.knime.base.node.mine.pca.SettingsModelPCADimensions"/>
+                <message_argument value="org.knime.base_3.8.0"/>
+            </message_arguments>
+        </filter>
+    </resource>
     <resource path="src-deprecated/org/knime/base/node/mine/regression/linear/view/LinRegLineNodeView.java" type="org.knime.base.node.mine.regression.linear.view.LinRegLineNodeView">
         <filter id="338722907">
             <message_arguments>

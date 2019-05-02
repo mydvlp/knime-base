@@ -85,7 +85,9 @@ import Jama.Matrix;
  * The model class that implements the PCA on the input table.
  *
  * @author Uwe Nagel, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class PCANodeModel extends NodeModel {
 
     /**

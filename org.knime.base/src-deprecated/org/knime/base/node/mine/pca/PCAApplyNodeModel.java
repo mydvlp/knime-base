@@ -77,7 +77,9 @@ import Jama.Matrix;
  * PCA Predictor.
  *
  * @author uwe, University of Konstanz
+ * @deprecated
  */
+@Deprecated
 public class PCAApplyNodeModel extends NodeModel {
 
     /** config string for determining if source columns are to be removed. */

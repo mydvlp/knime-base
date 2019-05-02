@@ -1307,26 +1307,26 @@
 
       <node
             category-path="/analytics/mining/pca"
-            factory-class="org.knime.base.node.mine.pca.PCANodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.base.node.mine.pca.PCANodeFactory">
       </node>
       <node
             after="org.knime.base.node.mine.pca.PCANodeFactory"
             category-path="/analytics/mining/pca"
-            factory-class="org.knime.base.node.mine.pca.PCAComputeNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.base.node.mine.pca.PCAComputeNodeFactory">
       </node>
       <node
             after="org.knime.base.node.mine.pca.PCAComputeNodeFactory"
             category-path="/analytics/mining/pca"
-            factory-class="org.knime.base.node.mine.pca.PCAApplyNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.base.node.mine.pca.PCAApplyNodeFactory">
       </node>
       <node
             after="org.knime.base.node.mine.pca.PCAApplyNodeFactory"
             category-path="/analytics/mining/pca"
-            factory-class="org.knime.base.node.mine.pca.PCAReverseNodeFactory"
-            >
+            deprecated="true"
+            factory-class="org.knime.base.node.mine.pca.PCAReverseNodeFactory">
       </node>
       <node
             after="org.knime.base.node.preproc.colconvert.stringtonumber.StringToNumberNodeFactory"
